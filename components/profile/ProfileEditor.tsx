@@ -4,6 +4,8 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateProfile, uploadAvatar, type ProfileUpdate } from "@/app/actions/profile";
 import { MemberAvatar } from "@/components/budget/MemberAvatar";
+import AvatarCropper from "./AvatarCropper";
+import { fileToDataURL } from "@/lib/cropImage";
 
 type Props = {
   initial: ProfileUpdate & { id: string; email: string | null };
@@ -22,22 +24,34 @@ export default function ProfileEditor({ initial }: Props) {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
+    if (fileInputRef.current) fileInputRef.current.value = "";
     if (!file) return;
+    if (file.size > 20 * 1024 * 1024) {
+      setError("Image must be under 20MB");
+      return;
+    }
+    setError(null);
+    try {
+      const dataUrl = await fileToDataURL(file);
+      setCropSrc(dataUrl);
+    } catch {
+      setError("Couldn't read that image");
+    }
+  }
+
+  async function handleCropConfirm(blob: Blob) {
     setUploading(true);
     setError(null);
-
     const fd = new FormData();
-    fd.append("file", file);
+    fd.append("file", new File([blob], "avatar.jpg", { type: "image/jpeg" }));
     const result = await uploadAvatar(fd);
-
     setUploading(false);
-    // Reset the input so picking the same file again still fires onChange
-    if (fileInputRef.current) fileInputRef.current.value = "";
-
+    setCropSrc(null);
     if (!result.ok) {
       setError(result.error);
       return;
@@ -104,7 +118,7 @@ export default function ProfileEditor({ initial }: Props) {
           >
             <MemberAvatar profile={previewProfile} size={72} />
             <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
-              {uploading ? "…" : "Change"}
+              {uploading ? "…" : "Edit"}
             </div>
           </button>
           <input
@@ -194,6 +208,14 @@ export default function ProfileEditor({ initial }: Props) {
           </button>
         </div>
       </div>
+
+      {cropSrc && (
+        <AvatarCropper
+          imageSrc={cropSrc}
+          onCancel={() => setCropSrc(null)}
+          onConfirm={handleCropConfirm}
+        />
+      )}
     </div>
   );
 }
