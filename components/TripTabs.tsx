@@ -24,7 +24,7 @@ export default function TripTabs({ tripId }: { tripId: string }) {
             <Link
               key={tab.href}
               href={tab.href}
-              className={`whitespace-nowrap border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
+              className={`flex h-11 items-center whitespace-nowrap border-b-2 px-2 text-sm font-medium transition-colors sm:px-1 ${
                 active
                   ? "border-neutral-900 text-neutral-900"
                   : "border-transparent text-neutral-500 hover:text-neutral-800"

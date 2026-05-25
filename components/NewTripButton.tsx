@@ -13,8 +13,8 @@ export default function NewTripButton({ variant = "primary", label = "New trip" 
 
   const className =
     variant === "primary"
-      ? "inline-flex items-center gap-2 rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 transition-colors"
-      : "inline-flex items-center gap-2 rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors";
+      ? "inline-flex h-11 items-center gap-2 rounded-md bg-neutral-900 px-4 text-sm font-medium text-white hover:bg-neutral-700 transition-colors"
+      : "inline-flex h-11 items-center gap-2 rounded-md border border-neutral-300 bg-white px-4 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors";
 
   return (
     <>

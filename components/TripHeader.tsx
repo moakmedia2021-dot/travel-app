@@ -23,7 +23,7 @@ export default function TripHeader({
 
   return (
     <Wrapper className={wrapperClass}>
-      <div className="group relative aspect-[21/9] w-full bg-gradient-to-br from-neutral-200 to-neutral-300 sm:aspect-[3/1]">
+      <div className="group relative aspect-[16/9] w-full bg-gradient-to-br from-neutral-200 to-neutral-300 sm:aspect-[3/1]">
         {trip.cover_image_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -47,14 +47,14 @@ export default function TripHeader({
         </div>
       </div>
 
-      <div className="p-5 sm:p-6">
+      <div className="p-4 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
-            <h1 className="text-2xl font-semibold text-neutral-900">{trip.title}</h1>
+            <h1 className="text-xl font-semibold text-neutral-900 sm:text-2xl">{trip.title}</h1>
             {trip.destination && (
               <p className="mt-0.5 text-sm text-neutral-500">{trip.destination}</p>
             )}
-            <p className="mt-2 text-sm text-neutral-600">
+            <p className="mt-1.5 text-sm text-neutral-600">
               {formatDateRange(trip.start_date, trip.end_date)}
             </p>
           </div>
