@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 function safeNext(raw: string | null): string {
@@ -18,9 +18,6 @@ function currentNext(): string {
 export default function SignupPage() {
   const router = useRouter();
   const supabase = createClient();
-  const searchParams = useSearchParams();
-  // Used only for the "Sign in" link in the UI.
-  const next = safeNext(searchParams.get("next"));
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -171,7 +168,7 @@ export default function SignupPage() {
 
         <p className="mt-6 text-center text-sm text-neutral-500">
           Already have an account?{" "}
-          <Link href={`/login${next !== "/dashboard" ? `?next=${encodeURIComponent(next)}` : ""}`} className="font-medium text-neutral-900 hover:underline">
+          <Link href="/login" className="font-medium text-neutral-900 hover:underline">
             Sign in
           </Link>
         </p>
