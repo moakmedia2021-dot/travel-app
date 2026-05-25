@@ -56,7 +56,7 @@ export async function uploadAvatar(
 ): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
   const file = formData.get("file");
   if (!(file instanceof File)) return { ok: false, error: "No file uploaded" };
-  if (file.size > 5 * 1024 * 1024) return { ok: false, error: "Image must be under 5MB" };
+  if (file.size > 20 * 1024 * 1024) return { ok: false, error: "Image must be under 20MB" };
   if (!file.type.startsWith("image/")) return { ok: false, error: "Only images are allowed" };
 
   const supabase = await createClient();
