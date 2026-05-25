@@ -47,6 +47,18 @@ export function MemberAvatar({
       </div>
     );
   }
+  if (profile.avatar_url) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={profile.avatar_url}
+        alt={memberDisplayName(profile)}
+        title={memberDisplayName(profile)}
+        className="rounded-full object-cover"
+        style={{ width: size, height: size }}
+      />
+    );
+  }
   const color = colorFor(profile.id);
   return (
     <div

@@ -4,13 +4,20 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
+import { MemberAvatar, memberDisplayName } from "@/components/budget/MemberAvatar";
+import type { Profile } from "@/lib/types";
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/trips", label: "Trips" },
 ];
 
-export default function Navbar({ user }: { user: User | null }) {
+type Props = {
+  user: User | null;
+  profile: Profile | null;
+};
+
+export default function Navbar({ user, profile }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
@@ -21,7 +28,9 @@ export default function Navbar({ user }: { user: User | null }) {
     router.refresh();
   }
 
-  const initials = user?.email?.slice(0, 2).toUpperCase() ?? "??";
+  const displayName = profile
+    ? memberDisplayName(profile)
+    : user?.email?.split("@")[0] ?? "?";
 
   return (
     <header className="border-b border-neutral-200 bg-white">
@@ -51,9 +60,13 @@ export default function Navbar({ user }: { user: User | null }) {
         {/* User avatar / sign-out */}
         {user ? (
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-200 text-xs font-medium text-neutral-700">
-              {initials}
-            </div>
+            <Link
+              href="/profile"
+              className="flex items-center gap-2 rounded-full transition-opacity hover:opacity-80"
+              title={`Edit profile (${displayName})`}
+            >
+              <MemberAvatar profile={profile} size={32} />
+            </Link>
             <button
               onClick={handleSignOut}
               className="text-sm text-neutral-500 hover:text-neutral-800 transition-colors"
