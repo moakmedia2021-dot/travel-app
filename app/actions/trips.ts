@@ -50,3 +50,51 @@ export async function createTrip(input: CreateTripInput): Promise<CreateTripResu
 
   return { ok: true, id: tripId as string };
 }
+
+export type UpdateTripInput = {
+  title: string;
+  destination: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  status: "draft" | "planned" | "active" | "completed";
+  visibility: TripVisibility;
+  budgetTotal: number | null;
+  currency: string | null;
+  travelers: number | null;
+};
+
+export async function updateTrip(
+  tripId: string,
+  input: UpdateTripInput
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("update_trip", {
+    p_id: tripId,
+    p_title: input.title,
+    p_destination: input.destination,
+    p_start_date: input.startDate,
+    p_end_date: input.endDate,
+    p_status: input.status,
+    p_visibility: input.visibility,
+    p_budget_total: input.budgetTotal,
+    p_currency: input.currency,
+    p_travelers: input.travelers,
+  });
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath(`/trips/${tripId}`, "layout");
+  revalidatePath("/trips");
+  revalidatePath("/dashboard");
+  return { ok: true };
+}
+
+export async function deleteTrip(
+  tripId: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("delete_trip", { p_id: tripId });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/trips");
+  revalidatePath("/dashboard");
+  return { ok: true };
+}
