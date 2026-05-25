@@ -10,6 +10,9 @@ import type { Profile } from "@/lib/types";
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/trips", label: "Trips" },
+  { href: "/feed", label: "Feed" },
+  { href: "/discover", label: "Discover" },
+  { href: "/connections", label: "Connections" },
 ];
 
 type Props = {

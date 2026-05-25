@@ -11,7 +11,72 @@ export type Profile = {
   username: string | null;
   full_name: string | null;
   avatar_url: string | null;
+  bio?: string | null;
+  home_city?: string | null;
   home_airport?: string | null;
+  travel_tags?: string[] | null;
+  countries_visited?: string[] | null;
+  instagram_handle?: string | null;
+};
+
+export type ConnectionStatus = "pending" | "accepted" | "declined" | "cancelled";
+
+export type SocialConnection = {
+  id: string;
+  requester_id: string;
+  addressee_id: string;
+  status: ConnectionStatus;
+  message: string | null;
+  created_at: string;
+};
+
+export type TripPost = {
+  id: string;
+  user_id: string;
+  trip_id: string | null;
+  content: string;
+  location_name: string | null;
+  image_url: string | null;
+  created_at: string;
+};
+
+export type TravelTip = {
+  id: string;
+  user_id: string;
+  location_name: string;
+  lat: number | null;
+  lng: number | null;
+  content: string;
+  category: string | null;
+  created_at: string;
+};
+
+export type FeedItem = {
+  kind: "post" | "tip";
+  id: string;
+  user_id: string;
+  content: string;
+  location_name: string | null;
+  image_url: string | null;
+  category: string | null;
+  trip_id: string | null;
+  created_at: string;
+  full_name: string | null;
+  username: string | null;
+  avatar_url: string | null;
+};
+
+export type DiscoverTraveler = {
+  user_id: string;
+  score: number;
+  full_name: string | null;
+  username: string | null;
+  avatar_url: string | null;
+  destination: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  travel_tags: string[];
+  mutual_followers: number;
 };
 
 export type TripMember = {

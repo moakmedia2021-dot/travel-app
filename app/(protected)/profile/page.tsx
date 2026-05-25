@@ -11,7 +11,7 @@ export default async function ProfilePage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, username, full_name, bio, home_city, avatar_url")
+    .select("id, username, full_name, bio, home_city, avatar_url, instagram_handle, travel_tags, countries_visited")
     .eq("id", user.id)
     .single();
 
@@ -25,6 +25,9 @@ export default async function ProfilePage() {
         bio: profile?.bio ?? null,
         home_city: profile?.home_city ?? null,
         avatar_url: profile?.avatar_url ?? null,
+        instagram_handle: profile?.instagram_handle ?? null,
+        travel_tags: profile?.travel_tags ?? null,
+        countries_visited: profile?.countries_visited ?? null,
       }}
     />
   );

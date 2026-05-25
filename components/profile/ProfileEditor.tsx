@@ -6,6 +6,7 @@ import { updateProfile, uploadAvatar, type ProfileUpdate } from "@/app/actions/p
 import { MemberAvatar } from "@/components/budget/MemberAvatar";
 import AvatarCropper from "./AvatarCropper";
 import { fileToDataURL } from "@/lib/cropImage";
+import CountriesPicker from "./CountriesPicker";
 
 type Props = {
   initial: ProfileUpdate & { id: string; email: string | null };
@@ -19,6 +20,9 @@ export default function ProfileEditor({ initial }: Props) {
     bio: initial.bio ?? "",
     home_city: initial.home_city ?? "",
     avatar_url: initial.avatar_url ?? "",
+    instagram_handle: initial.instagram_handle ?? "",
+    travel_tags: (initial.travel_tags ?? []).join(", "),
+    countries_visited: initial.countries_visited ?? [],
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -72,12 +76,20 @@ export default function ProfileEditor({ initial }: Props) {
     setError(null);
     setSaved(false);
 
+    const tags = form.travel_tags
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+
     const result = await updateProfile({
       full_name: form.full_name || null,
       username: form.username || null,
       bio: form.bio || null,
       home_city: form.home_city || null,
       avatar_url: form.avatar_url || null,
+      instagram_handle: form.instagram_handle.replace(/^@/, "") || null,
+      travel_tags: tags,
+      countries_visited: form.countries_visited,
     });
 
     setSaving(false);
@@ -188,6 +200,35 @@ export default function ProfileEditor({ initial }: Props) {
             onChange={(e) => update("home_city", e.target.value)}
             placeholder="Austin, TX"
             className={inputClass}
+          />
+        </Field>
+
+        <Field label="Instagram handle" hint="Without the @">
+          <input
+            type="text"
+            value={form.instagram_handle}
+            onChange={(e) => update("instagram_handle", e.target.value.replace(/^@/, ""))}
+            placeholder="alicechen"
+            className={inputClass}
+          />
+        </Field>
+
+        <Field label="Travel tags" hint="Comma-separated. Used to match you with similar travelers.">
+          <input
+            type="text"
+            value={form.travel_tags}
+            onChange={(e) => update("travel_tags", e.target.value)}
+            placeholder="food, hiking, slow travel, photography"
+            className={inputClass}
+          />
+        </Field>
+
+        <Field label="Countries visited" hint={`${form.countries_visited.length} selected`}>
+          <CountriesPicker
+            selected={form.countries_visited}
+            onChange={(arr) =>
+              setForm((f) => ({ ...f, countries_visited: arr }))
+            }
           />
         </Field>
 

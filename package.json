@@ -14,10 +14,13 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.106.1",
+    "@types/react-simple-maps": "^3.0.6",
+    "d3-geo": "^3.1.1",
     "next": "14.2.29",
     "react": "^18",
     "react-dom": "^18",
-    "react-easy-crop": "^5.5.7"
+    "react-easy-crop": "^5.5.7",
+    "react-simple-maps": "^3.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",

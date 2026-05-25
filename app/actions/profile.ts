@@ -11,6 +11,9 @@ export type ProfileUpdate = {
   bio: string | null;
   home_city: string | null;
   avatar_url: string | null;
+  travel_tags?: string[] | null;
+  countries_visited?: string[] | null;
+  instagram_handle?: string | null;
 };
 
 export async function updateProfile(input: ProfileUpdate): Promise<Result> {
@@ -43,6 +46,9 @@ export async function updateProfile(input: ProfileUpdate): Promise<Result> {
       bio: input.bio?.trim() || null,
       home_city: input.home_city?.trim() || null,
       avatar_url: input.avatar_url?.trim() || null,
+      travel_tags: input.travel_tags ?? undefined,
+      countries_visited: input.countries_visited ?? undefined,
+      instagram_handle: input.instagram_handle?.trim() || null,
     })
     .eq("id", user.id);
   if (error) return { ok: false, error: error.message };
