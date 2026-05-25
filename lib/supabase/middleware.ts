@@ -33,18 +33,35 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isAuthRoute = pathname === "/login" || pathname === "/signup";
+  const isOnboardingRoute = pathname.startsWith("/onboarding");
   const isProtectedRoute =
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/trips") ||
     pathname.startsWith("/profile") ||
     pathname.startsWith("/discover") ||
     pathname.startsWith("/feed") ||
-    pathname.startsWith("/connections");
+    pathname.startsWith("/connections") ||
+    isOnboardingRoute;
 
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
+  }
+
+  // If the user hasn't completed onboarding, send them there
+  if (user && isProtectedRoute && !isOnboardingRoute) {
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select("onboarding_complete")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (prof && prof.onboarding_complete === false) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/onboarding";
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
   }
 
   if (user && isAuthRoute) {
