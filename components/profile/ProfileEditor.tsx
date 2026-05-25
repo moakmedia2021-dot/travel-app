@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { updateProfile, type ProfileUpdate } from "@/app/actions/profile";
+import { updateProfile, uploadAvatar, type ProfileUpdate } from "@/app/actions/profile";
 import { MemberAvatar } from "@/components/budget/MemberAvatar";
 
 type Props = {
@@ -21,6 +21,32 @@ export default function ProfileEditor({ initial }: Props) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError(null);
+
+    const fd = new FormData();
+    fd.append("file", file);
+    const result = await uploadAvatar(fd);
+
+    setUploading(false);
+    // Reset the input so picking the same file again still fires onChange
+    if (fileInputRef.current) fileInputRef.current.value = "";
+
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setForm((f) => ({ ...f, avatar_url: result.url }));
+    setSaved(true);
+    router.refresh();
+    setTimeout(() => setSaved(false), 2000);
+  }
 
   function update<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -69,14 +95,40 @@ export default function ProfileEditor({ initial }: Props) {
 
       <div className="rounded-xl border border-neutral-200 bg-white p-5">
         <div className="flex items-center gap-4">
-          <MemberAvatar profile={previewProfile} size={64} />
-          <div>
-            <div className="text-base font-semibold text-neutral-900">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="group relative shrink-0 disabled:opacity-50"
+            title="Change photo"
+          >
+            <MemberAvatar profile={previewProfile} size={72} />
+            <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
+              {uploading ? "…" : "Change"}
+            </div>
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-base font-semibold text-neutral-900">
               {form.full_name || form.username || "Set your name below"}
             </div>
             {initial.email && (
-              <div className="text-sm text-neutral-500">{initial.email}</div>
+              <div className="truncate text-sm text-neutral-500">{initial.email}</div>
             )}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="mt-2 text-xs font-medium text-neutral-600 underline hover:text-neutral-900 disabled:opacity-50"
+            >
+              {uploading ? "Uploading…" : "Upload photo"}
+            </button>
           </div>
         </div>
       </div>
@@ -121,16 +173,6 @@ export default function ProfileEditor({ initial }: Props) {
             value={form.home_city}
             onChange={(e) => update("home_city", e.target.value)}
             placeholder="Austin, TX"
-            className={inputClass}
-          />
-        </Field>
-
-        <Field label="Avatar URL" hint="Paste a link to any image (square works best)">
-          <input
-            type="url"
-            value={form.avatar_url}
-            onChange={(e) => update("avatar_url", e.target.value)}
-            placeholder="https://…"
             className={inputClass}
           />
         </Field>

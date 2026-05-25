@@ -51,6 +51,44 @@ export async function updateProfile(input: ProfileUpdate): Promise<Result> {
   return { ok: true };
 }
 
+export async function uploadAvatar(
+  formData: FormData
+): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
+  const file = formData.get("file");
+  if (!(file instanceof File)) return { ok: false, error: "No file uploaded" };
+  if (file.size > 5 * 1024 * 1024) return { ok: false, error: "Image must be under 5MB" };
+  if (!file.type.startsWith("image/")) return { ok: false, error: "Only images are allowed" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not authenticated" };
+
+  const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+  const path = `${user.id}/${Date.now()}.${ext}`;
+
+  const { error: uploadErr } = await supabase.storage.from("avatars").upload(path, file, {
+    upsert: false,
+    contentType: file.type,
+    cacheControl: "3600",
+  });
+  if (uploadErr) return { ok: false, error: uploadErr.message };
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("avatars").getPublicUrl(path);
+
+  const { error: updateErr } = await supabase
+    .from("profiles")
+    .update({ avatar_url: publicUrl })
+    .eq("id", user.id);
+  if (updateErr) return { ok: false, error: updateErr.message };
+
+  revalidatePath("/", "layout");
+  return { ok: true, url: publicUrl };
+}
+
 export async function updateHomeAirport(iata: string): Promise<Result> {
   const code = iata.trim().toUpperCase();
   if (!/^[A-Z]{3}$/.test(code)) return { ok: false, error: "Must be a 3-letter IATA code" };
