@@ -11,7 +11,8 @@ import { COUNTRY_BY_CODE } from "@/lib/countries";
 type Props = {
   profile: Profile;
   isMe: boolean;
-  currentUserId: string;
+  isAuthenticated?: boolean;
+  currentUserId: string | null;
   upcomingTrips: Trip[];
   pastTrips: Trip[];
   posts: TripPost[];
@@ -42,6 +43,7 @@ function timeAgo(iso: string): string {
 export default function PublicProfile({
   profile,
   isMe,
+  isAuthenticated = true,
   currentUserId,
   upcomingTrips,
   pastTrips,
@@ -93,7 +95,7 @@ export default function PublicProfile({
             </div>
           </div>
 
-          {!isMe && (
+          {!isMe && isAuthenticated && currentUserId && (
             <div className="flex flex-wrap items-center gap-2">
               <FollowButton targetId={profile.id} initialFollowing={isFollowing} />
               <ConnectButton

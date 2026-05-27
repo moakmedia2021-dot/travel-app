@@ -34,14 +34,23 @@ export async function updateSession(request: NextRequest) {
 
   const isAuthRoute = pathname === "/login" || pathname === "/signup";
   const isOnboardingRoute = pathname.startsWith("/onboarding");
+
+  // Public pages — no auth required:
+  // - /profile/{username}, /trips/{id}/public, /destination/{slug}
+  const isPublicRoute =
+    /^\/profile\/[^/]+/.test(pathname) ||
+    /^\/trips\/[^/]+\/public/.test(pathname) ||
+    pathname.startsWith("/destination/");
+
   const isProtectedRoute =
-    pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/trips") ||
-    pathname.startsWith("/profile") ||
-    pathname.startsWith("/discover") ||
-    pathname.startsWith("/feed") ||
-    pathname.startsWith("/connections") ||
-    isOnboardingRoute;
+    !isPublicRoute &&
+    (pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/trips") ||
+      pathname === "/profile" ||
+      pathname.startsWith("/discover") ||
+      pathname.startsWith("/feed") ||
+      pathname.startsWith("/connections") ||
+      isOnboardingRoute);
 
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone();
