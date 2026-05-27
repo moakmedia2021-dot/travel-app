@@ -126,19 +126,19 @@ export default function NewTripModal({ open, onClose }: Props) {
       onClick={handleClose}
     >
       <div
-        className="relative w-full max-w-md rounded-t-2xl sm:rounded-2xl bg-white shadow-xl"
+        className="relative flex h-[100dvh] w-full max-w-md flex-col rounded-t-2xl bg-white shadow-xl sm:h-auto sm:max-h-[90vh] sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <SheetHandle />
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-neutral-200 px-6 py-4">
+        <div className="flex shrink-0 items-center justify-between border-b border-neutral-200 px-6 py-4">
           <h2 className="text-lg font-semibold text-neutral-900">New trip</h2>
           <button
             onClick={handleClose}
-            className="text-neutral-400 hover:text-neutral-700 transition-colors"
+            className="flex h-11 w-11 items-center justify-center text-neutral-400 hover:text-neutral-700 transition-colors"
             aria-label="Close"
           >
-            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -158,7 +158,7 @@ export default function NewTripModal({ open, onClose }: Props) {
         <p className="px-6 pt-2 text-xs text-neutral-500">Step {step} of 3</p>
 
         {/* Body */}
-        <div className="px-6 py-5 space-y-4">
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
           {step === 1 && (
             <>
               <Field label="Trip name" required>
@@ -290,7 +290,7 @@ export default function NewTripModal({ open, onClose }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between gap-3 border-t border-neutral-200 px-6 py-4">
+        <div className="flex shrink-0 items-center justify-between gap-3 border-t border-neutral-200 px-6 py-4 pb-[max(env(safe-area-inset-bottom),1rem)] sm:pb-4">
           <button
             onClick={step === 1 ? handleClose : handleBack}
             className="text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors"

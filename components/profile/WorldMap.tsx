@@ -1,47 +1,33 @@
 "use client";
 
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
+import { ISO_N3_TO_A3 } from "@/lib/isoNumericToAlpha3";
 
-// Topojson source — world countries with ISO-A3 codes in properties.
-// Hosted by react-simple-maps; can be swapped for a local copy later.
 const GEO_URL =
   "https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json";
 
-// world-atlas uses numeric IDs that map to ISO-N3. We'll match against the
-// "name" property since ISO-A3 isn't in the file. Build a name→A3 lookup.
-import { COUNTRIES } from "@/lib/countries";
-
-const NAME_TO_A3: Record<string, string> = Object.fromEntries(
-  COUNTRIES.map((c) => [c.name.toLowerCase(), c.code])
-);
-// A few aliases for names that differ between world-atlas and our list
-const ALIASES: Record<string, string> = {
-  "united states of america": "USA",
-  "russian federation": "RUS",
-  "czech republic": "CZE",
-  "korea, republic of": "KOR",
-  "south korea": "KOR",
-  "united kingdom": "GBR",
-  "iran (islamic republic of)": "IRN",
-  "viet nam": "VNM",
-};
-
-function a3For(name: string | undefined): string | null {
-  if (!name) return null;
-  const lower = name.toLowerCase();
-  return NAME_TO_A3[lower] ?? ALIASES[lower] ?? null;
-}
-
 type Props = {
-  visited: string[]; // ISO-A3 codes
+  visited: string[]; // ISO alpha-3 codes
   height?: number;
 };
+
+function a3For(geo: { id?: string | number; properties?: { name?: string } }): string | null {
+  // world-atlas uses ISO 3166-1 numeric ids — pad to 3 digits
+  if (geo.id != null) {
+    const id3 = String(geo.id).padStart(3, "0");
+    if (ISO_N3_TO_A3[id3]) return ISO_N3_TO_A3[id3];
+  }
+  return null;
+}
 
 export default function WorldMap({ visited, height = 280 }: Props) {
   const visitedSet = new Set(visited);
 
   return (
-    <div className="overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50" style={{ height }}>
+    <div
+      className="overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50"
+      style={{ height }}
+    >
       <ComposableMap
         projection="geoEqualEarth"
         projectionConfig={{ scale: 155 }}
@@ -52,8 +38,8 @@ export default function WorldMap({ visited, height = 280 }: Props) {
         <Geographies geography={GEO_URL}>
           {({ geographies }) =>
             geographies.map((geo) => {
-              const a3 = a3For(geo.properties.name);
-              const isVisited = a3 && visitedSet.has(a3);
+              const a3 = a3For(geo);
+              const isVisited = a3 ? visitedSet.has(a3) : false;
               return (
                 <Geography
                   key={geo.rsmKey}

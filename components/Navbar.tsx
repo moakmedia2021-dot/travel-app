@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { usePathname } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { MemberAvatar, memberDisplayName } from "@/components/budget/MemberAvatar";
 import type { Profile } from "@/lib/types";
@@ -22,14 +21,6 @@ type Props = {
 
 export default function Navbar({ user, profile }: Props) {
   const pathname = usePathname();
-  const router = useRouter();
-  const supabase = createClient();
-
-  async function handleSignOut() {
-    await supabase.auth.signOut();
-    router.push("/login");
-    router.refresh();
-  }
 
   const displayName = profile
     ? memberDisplayName(profile)
@@ -66,30 +57,15 @@ export default function Navbar({ user, profile }: Props) {
         {/* Right side */}
         {user ? (
           <div className="flex items-center gap-3">
-            {/* Desktop: avatar + sign out */}
-            <div className="hidden items-center gap-3 md:flex">
-              <Link
-                href="/profile"
-                className="rounded-full transition-opacity hover:opacity-80"
-                title={`Edit profile (${displayName})`}
-              >
-                <MemberAvatar profile={profile} size={32} />
-              </Link>
-              <button
-                onClick={handleSignOut}
-                className="text-sm text-neutral-500 hover:text-neutral-800 transition-colors"
-              >
-                Sign out
-              </button>
-            </div>
-
-            {/* Mobile: text sign-out link (avatar is in bottom bar) */}
-            <button
-              onClick={handleSignOut}
-              className="text-sm font-medium text-neutral-500 hover:text-neutral-800 md:hidden"
+            {/* Desktop: avatar only — Sign out lives on /profile */}
+            <Link
+              href="/profile"
+              className="rounded-full transition-opacity hover:opacity-80"
+              title={`Edit profile (${displayName})`}
             >
-              Sign out
-            </button>
+              <MemberAvatar profile={profile} size={32} />
+            </Link>
+
           </div>
         ) : (
           <Link

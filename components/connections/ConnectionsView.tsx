@@ -6,6 +6,8 @@ import Link from "next/link";
 import { MemberAvatar, memberDisplayName } from "@/components/budget/MemberAvatar";
 import { respondConnection, cancelConnection, removeConnection } from "@/app/actions/social";
 import type { Profile } from "@/lib/types";
+import type { MyPendingInvite } from "@/app/actions/invites";
+import TripInviteRow from "./TripInviteRow";
 
 type Row = {
   id: string;
@@ -20,9 +22,10 @@ type Props = {
   incoming: Row[];
   outgoing: Row[];
   accepted: Row[];
+  tripInvites: MyPendingInvite[];
 };
 
-export default function ConnectionsView({ incoming, outgoing, accepted }: Props) {
+export default function ConnectionsView({ incoming, outgoing, accepted, tripInvites }: Props) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -58,6 +61,14 @@ export default function ConnectionsView({ incoming, outgoing, accepted }: Props)
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold text-neutral-900">Connections</h1>
+
+      {tripInvites.length > 0 && (
+        <Section title={`Trip invites · ${tripInvites.length}`}>
+          {tripInvites.map((inv) => (
+            <TripInviteRow key={inv.invite_id} invite={inv} />
+          ))}
+        </Section>
+      )}
 
       {incoming.length > 0 && (
         <Section title={`Incoming requests · ${incoming.length}`}>

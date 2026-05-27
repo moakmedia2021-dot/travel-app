@@ -7,6 +7,7 @@ import { MemberAvatar } from "@/components/budget/MemberAvatar";
 import AvatarCropper from "./AvatarCropper";
 import { fileToDataURL } from "@/lib/cropImage";
 import CountriesPicker from "./CountriesPicker";
+import { createClient } from "@/lib/supabase/client";
 
 type Props = {
   initial: ProfileUpdate & { id: string; email: string | null };
@@ -243,11 +244,28 @@ export default function ProfileEditor({ initial }: Props) {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-50"
+            className="h-11 rounded-md bg-neutral-900 px-4 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-50"
           >
             {saving ? "Saving…" : "Save profile"}
           </button>
         </div>
+      </div>
+
+      {/* Sign out lives here and only here */}
+      <div className="rounded-xl border border-neutral-200 bg-white p-5">
+        <h3 className="text-sm font-semibold text-neutral-900">Account</h3>
+        <p className="mt-1 text-sm text-neutral-500">Sign out of your account on this device.</p>
+        <button
+          onClick={async () => {
+            const supabase = createClient();
+            await supabase.auth.signOut();
+            router.push("/login");
+            router.refresh();
+          }}
+          className="mt-3 h-11 rounded-md border border-neutral-300 bg-white px-4 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+        >
+          Sign out
+        </button>
       </div>
 
       {cropSrc && (

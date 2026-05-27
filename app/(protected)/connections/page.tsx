@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import ConnectionsView from "@/components/connections/ConnectionsView";
+import { listMyPendingInvites } from "@/app/actions/invites";
 import type { Profile, SocialConnection } from "@/lib/types";
 
 type ConnectionRow = SocialConnection & {
@@ -15,12 +16,15 @@ export default async function ConnectionsPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data } = await supabase
-    .from("social_connections")
-    .select(
-      "*, requester:profiles!requester_id(id, username, full_name, avatar_url), addressee:profiles!addressee_id(id, username, full_name, avatar_url)"
-    )
-    .order("created_at", { ascending: false });
+  const [{ data }, tripInvites] = await Promise.all([
+    supabase
+      .from("social_connections")
+      .select(
+        "*, requester:profiles!requester_id(id, username, full_name, avatar_url), addressee:profiles!addressee_id(id, username, full_name, avatar_url)"
+      )
+      .order("created_at", { ascending: false }),
+    listMyPendingInvites(),
+  ]);
 
   const rows = (data ?? []) as ConnectionRow[];
 
@@ -46,5 +50,12 @@ export default async function ConnectionsPage() {
   const outgoing = enriched.filter((r) => r.status === "pending" && r.iAmRequester);
   const accepted = enriched.filter((r) => r.status === "accepted");
 
-  return <ConnectionsView incoming={incoming} outgoing={outgoing} accepted={accepted} />;
+  return (
+    <ConnectionsView
+      incoming={incoming}
+      outgoing={outgoing}
+      accepted={accepted}
+      tripInvites={tripInvites}
+    />
+  );
 }
