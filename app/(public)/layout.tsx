@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import PublicNav from "@/components/public/PublicNav";
+import BottomTabBar from "@/components/BottomTabBar";
 import type { Profile } from "@/lib/types";
 
 export default async function PublicLayout({
@@ -23,11 +24,12 @@ export default async function PublicLayout({
   }
 
   return (
-    <div className="min-h-screen">
+    <div className={`min-h-screen ${user ? "pb-20 md:pb-0" : ""}`}>
       <PublicNav user={user} profile={profile} />
       <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
         {children}
       </main>
+      {user && <BottomTabBar profile={profile} />}
     </div>
   );
 }

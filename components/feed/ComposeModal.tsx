@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPost, uploadPostImage } from "@/app/actions/posts";
+import SheetHandle from "@/components/ui/SheetHandle";
 
 type Props = {
   open: boolean;
@@ -72,6 +73,7 @@ export default function ComposeModal({ open, onClose, trips }: Props) {
         className="w-full max-w-md rounded-t-2xl sm:rounded-2xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
+        <SheetHandle />
         <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
           <h2 className="text-base font-semibold text-neutral-900">New post</h2>
           <button onClick={onClose} className="text-neutral-400 hover:text-neutral-700" aria-label="Close">

@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import Cropper from "react-easy-crop";
 import { getCroppedBlob, type CropArea } from "@/lib/cropImage";
+import SheetHandle from "@/components/ui/SheetHandle";
 
 type Props = {
   imageSrc: string;
@@ -37,6 +38,7 @@ export default function AvatarCropper({ imageSrc, onCancel, onConfirm }: Props) 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-neutral-900/60 px-0 sm:px-4">
       <div className="flex w-full max-w-md flex-col rounded-t-2xl sm:rounded-2xl bg-white shadow-xl">
+        <SheetHandle />
         <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
           <h2 className="text-base font-semibold text-neutral-900">Crop your photo</h2>
           <button

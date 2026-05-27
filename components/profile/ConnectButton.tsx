@@ -7,6 +7,7 @@ import {
   cancelConnection,
   removeConnection,
 } from "@/app/actions/social";
+import SheetHandle from "@/components/ui/SheetHandle";
 
 type Connection = {
   id: string;
@@ -109,6 +110,7 @@ export default function ConnectButton({ targetId, currentUserId, connection }: P
             className="w-full max-w-md rounded-t-2xl sm:rounded-2xl bg-white shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
+            <SheetHandle />
             <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
               <h2 className="text-base font-semibold text-neutral-900">Send connection request</h2>
               <button onClick={() => setShowModal(false)} className="text-neutral-400 hover:text-neutral-700" aria-label="Close">

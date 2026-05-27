@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { UnsplashPhoto } from "@/lib/unsplash";
 import { searchCoverPhotos, setTripCover, unsplashConfigured } from "@/app/actions/photos";
+import SheetHandle from "@/components/ui/SheetHandle";
 
 type Props = {
   open: boolean;
@@ -64,6 +65,7 @@ export default function CoverPhotoPicker({ open, onClose, tripId, initialQuery }
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-neutral-900/50 px-0 sm:px-4" onClick={onClose}>
       <div className="relative w-full max-w-3xl rounded-t-2xl sm:rounded-2xl bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <SheetHandle />
         <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
           <h2 className="text-base font-semibold text-neutral-900">Choose a cover photo</h2>
           <button onClick={onClose} className="text-neutral-400 hover:text-neutral-700" aria-label="Close">

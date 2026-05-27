@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { InvitableUser } from "@/lib/types";
 import { MemberAvatar, memberDisplayName } from "@/components/budget/MemberAvatar";
 import { searchInvitableUsers, createInvite } from "@/app/actions/invites";
+import SheetHandle from "@/components/ui/SheetHandle";
 
 type Props = {
   tripId: string;
@@ -95,6 +96,7 @@ export default function InviteModal({ tripId, open, onClose, onInvited }: Props)
         className="relative w-full max-w-md rounded-t-2xl sm:rounded-2xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
+        <SheetHandle />
         <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
           <h2 className="text-base font-semibold text-neutral-900">Invite people</h2>
           <button onClick={onClose} className="text-neutral-400 hover:text-neutral-700" aria-label="Close">

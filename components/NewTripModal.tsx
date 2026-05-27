@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createTrip } from "@/app/actions/trips";
 import { CURRENCIES } from "@/lib/currencies";
 import type { TripVisibility } from "@/lib/types";
+import SheetHandle from "@/components/ui/SheetHandle";
 
 type Props = {
   open: boolean;
@@ -128,6 +129,7 @@ export default function NewTripModal({ open, onClose }: Props) {
         className="relative w-full max-w-md rounded-t-2xl sm:rounded-2xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
+        <SheetHandle />
         {/* Header */}
         <div className="flex items-center justify-between border-b border-neutral-200 px-6 py-4">
           <h2 className="text-lg font-semibold text-neutral-900">New trip</h2>

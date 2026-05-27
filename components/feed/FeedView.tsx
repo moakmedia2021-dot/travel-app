@@ -63,10 +63,10 @@ export default function FeedView({ initialItems, trips }: Props) {
         </div>
       )}
 
-      {/* FAB on mobile */}
+      {/* FAB on mobile — sits above the bottom tab bar */}
       <button
         onClick={() => setComposeOpen(true)}
-        className="fixed bottom-6 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-neutral-900 text-white shadow-lg hover:bg-neutral-700 sm:hidden"
+        className="fixed right-4 bottom-[calc(env(safe-area-inset-bottom)+5rem)] z-30 flex h-14 w-14 items-center justify-center rounded-full bg-neutral-900 text-white shadow-lg hover:bg-neutral-700 md:hidden"
         aria-label="New post"
       >
         <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">

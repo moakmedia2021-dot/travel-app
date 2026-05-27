@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import Navbar from "@/components/Navbar";
+import BottomTabBar from "@/components/BottomTabBar";
 import type { Profile } from "@/lib/types";
 
 export default async function ProtectedLayout({
@@ -23,11 +24,12 @@ export default async function ProtectedLayout({
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-20 md:pb-0">
       <Navbar user={user} profile={profile} />
       <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
         {children}
       </main>
+      <BottomTabBar profile={profile} />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { generateTripItinerary, bulkAddItineraryItems, openAIConfigured } from "@/app/actions/ai";
 import type { GeneratedItem } from "@/lib/openai";
 import { TYPE_CONFIG } from "./typeConfig";
+import SheetHandle from "@/components/ui/SheetHandle";
 
 const INTERESTS = [
   "Food",
@@ -95,6 +96,7 @@ export default function AIGeneratorModal({ open, tripId, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-neutral-900/50 px-0 sm:px-4" onClick={onClose}>
       <div className="relative flex max-h-[90vh] w-full max-w-xl flex-col rounded-t-2xl sm:rounded-2xl bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <SheetHandle />
         <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
           <div className="flex items-center gap-2">
             <span className="text-lg">✨</span>
