@@ -4,18 +4,28 @@ import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { createServiceClient } from "@/lib/supabase/service";
 
-// Stripe requires the raw body for signature verification, so this route
-// can't be edge / can't use req.json().
 export const runtime = "nodejs";
+
+// Stripe moved current_period_end off the Subscription root and onto
+// subscription items in newer API versions. Pull from wherever it is.
+function readPeriodEnd(sub: unknown): number | null {
+  const s = sub as {
+    current_period_end?: number;
+    items?: { data?: Array<{ current_period_end?: number }> };
+  };
+  return s.current_period_end ?? s.items?.data?.[0]?.current_period_end ?? null;
+}
 
 export async function POST(req: Request) {
   const sigHeader = (await headers()).get("stripe-signature");
   if (!sigHeader) {
+    console.error("[stripe webhook] missing stripe-signature header");
     return new NextResponse("Missing signature", { status: 400 });
   }
 
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!webhookSecret) {
+    console.error("[stripe webhook] STRIPE_WEBHOOK_SECRET not set");
     return new NextResponse("Webhook not configured", { status: 500 });
   }
 
@@ -30,54 +40,82 @@ export async function POST(req: Request) {
     return new NextResponse("Invalid signature", { status: 400 });
   }
 
-  const supabase = createServiceClient();
+  console.log(`[stripe webhook] received ${event.type}`);
+
+  let supabase;
+  try {
+    supabase = createServiceClient();
+  } catch (err) {
+    console.error("[stripe webhook] cannot create service client", err);
+    return new NextResponse("Service config error", { status: 500 });
+  }
 
   try {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
-        const userId = session.metadata?.user_id;
+        const userId = session.metadata?.user_id ?? session.client_reference_id;
         const subId = session.subscription as string | null;
         const customerId = session.customer as string | null;
-        if (!userId || !subId) break;
+
+        console.log("[stripe webhook] checkout.session.completed", {
+          userId,
+          subId,
+          customerId,
+        });
+
+        if (!userId || !subId) {
+          console.error("[stripe webhook] missing userId or subId on checkout session");
+          break;
+        }
 
         const subResp = await stripe.subscriptions.retrieve(subId);
-        const periodEnd = (subResp as unknown as { current_period_end: number }).current_period_end;
-        await supabase
+        const periodEndSec = readPeriodEnd(subResp);
+        const periodEndISO = periodEndSec
+          ? new Date(periodEndSec * 1000).toISOString()
+          : null;
+
+        const { error } = await supabase
           .from("profiles")
           .update({
             subscription_status: "premium",
             subscription_id: subId,
             subscription_customer_id: customerId,
-            subscription_period_end: new Date(periodEnd * 1000).toISOString(),
+            subscription_period_end: periodEndISO,
           })
           .eq("id", userId);
+        if (error) {
+          console.error("[stripe webhook] update profile failed", error);
+        } else {
+          console.log("[stripe webhook] profile updated to premium", userId);
+        }
         break;
       }
 
       case "customer.subscription.updated": {
         const sub = event.data.object as Stripe.Subscription;
         const customerId = sub.customer as string;
-        const periodEnd = (sub as Stripe.Subscription & { current_period_end: number })
-          .current_period_end;
-        // 'cancel_at_period_end = true' means user opted out; they keep
-        // access until period_end. We flag as 'cancelled' for UI.
+        const periodEndSec = readPeriodEnd(sub);
         const cancelling = sub.cancel_at_period_end || sub.status === "canceled";
-        await supabase
+
+        const { error } = await supabase
           .from("profiles")
           .update({
             subscription_status: cancelling ? "cancelled" : "premium",
             subscription_id: sub.id,
-            subscription_period_end: new Date(periodEnd * 1000).toISOString(),
+            subscription_period_end: periodEndSec
+              ? new Date(periodEndSec * 1000).toISOString()
+              : null,
           })
           .eq("subscription_customer_id", customerId);
+        if (error) console.error("[stripe webhook] sub.updated update failed", error);
         break;
       }
 
       case "customer.subscription.deleted": {
         const sub = event.data.object as Stripe.Subscription;
         const customerId = sub.customer as string;
-        await supabase
+        const { error } = await supabase
           .from("profiles")
           .update({
             subscription_status: "free",
@@ -85,11 +123,11 @@ export async function POST(req: Request) {
             subscription_period_end: null,
           })
           .eq("subscription_customer_id", customerId);
+        if (error) console.error("[stripe webhook] sub.deleted update failed", error);
         break;
       }
 
       default:
-        // ignore other events
         break;
     }
   } catch (err) {

@@ -120,7 +120,7 @@ export default function BillingPanel({ status, isPremium, periodEnd, stripeConfi
         />
         <PlanCard
           name="Premium"
-          price="$6.99"
+          price="$19.99"
           period="/month"
           features={PREMIUM_FEATURES}
           highlight
@@ -133,14 +133,14 @@ export default function BillingPanel({ status, isPremium, periodEnd, stripeConfi
                   disabled={busy !== null}
                   className="h-11 rounded-md bg-neutral-900 px-4 text-sm font-semibold text-white hover:bg-neutral-700 disabled:opacity-50"
                 >
-                  {busy === "monthly" ? "Loading…" : "Subscribe monthly — $6.99/mo"}
+                  {busy === "monthly" ? "Loading…" : "Subscribe monthly — $19.99/mo"}
                 </button>
                 <button
                   onClick={() => go("annual")}
                   disabled={busy !== null}
                   className="h-11 rounded-md border border-neutral-900 bg-white px-4 text-sm font-semibold text-neutral-900 hover:bg-neutral-50 disabled:opacity-50"
                 >
-                  {busy === "annual" ? "Loading…" : "Save 41% — $49/year"}
+                  {busy === "annual" ? "Loading…" : "Save 20% — $190/year"}
                 </button>
               </div>
             )

@@ -251,21 +251,60 @@ export default function ProfileEditor({ initial }: Props) {
         </div>
       </div>
 
-      {/* Sign out lives here and only here */}
-      <div className="rounded-xl border border-neutral-200 bg-white p-5">
-        <h3 className="text-sm font-semibold text-neutral-900">Account</h3>
-        <p className="mt-1 text-sm text-neutral-500">Sign out of your account on this device.</p>
-        <button
-          onClick={async () => {
-            const supabase = createClient();
-            await supabase.auth.signOut();
-            router.push("/login");
-            router.refresh();
-          }}
-          className="mt-3 h-11 rounded-md border border-neutral-300 bg-white px-4 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+      {/* Account links + sign out */}
+      <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
+        <div className="border-b border-neutral-100 p-5">
+          <h3 className="text-sm font-semibold text-neutral-900">Account</h3>
+          <p className="mt-1 text-sm text-neutral-500">
+            Manage settings, billing, and notifications.
+          </p>
+        </div>
+
+        <a
+          href="/settings"
+          className="flex h-14 items-center justify-between border-b border-neutral-100 px-5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
         >
-          Sign out
-        </button>
+          <span className="flex items-center gap-3">
+            <svg className="h-5 w-5 text-neutral-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+            </svg>
+            Settings
+          </span>
+          <svg className="h-4 w-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+
+        <a
+          href="/settings/billing"
+          className="flex h-14 items-center justify-between border-b border-neutral-100 px-5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+        >
+          <span className="flex items-center gap-3">
+            <svg className="h-5 w-5 text-neutral-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="2" y="6" width="20" height="14" rx="2" />
+              <path d="M2 10h20M6 16h4" />
+            </svg>
+            Plan & billing
+          </span>
+          <svg className="h-4 w-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+
+        <div className="p-5">
+          <button
+            onClick={async () => {
+              const supabase = createClient();
+              await supabase.auth.signOut();
+              router.push("/login");
+              router.refresh();
+            }}
+            className="h-11 w-full rounded-md border border-neutral-300 bg-white px-4 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+          >
+            Sign out
+          </button>
+        </div>
       </div>
 
       {cropSrc && (
