@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { createServiceClient } from "@/lib/supabase/service";
+import { reportStripeError } from "@/lib/errorContext";
 
 export const runtime = "nodejs";
 
@@ -37,6 +38,7 @@ export async function POST(req: Request) {
     event = stripe.webhooks.constructEvent(body, sigHeader, webhookSecret);
   } catch (err) {
     console.error("[stripe webhook] signature verification failed", err);
+    reportStripeError(err, { event_type: "signature_verification" });
     return new NextResponse("Invalid signature", { status: 400 });
   }
 
@@ -132,6 +134,7 @@ export async function POST(req: Request) {
     }
   } catch (err) {
     console.error("[stripe webhook] handler error", err);
+    reportStripeError(err, { event_type: event.type });
     return new NextResponse("Handler error", { status: 500 });
   }
 

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import posthog from "posthog-js";
 import { createClient } from "@/lib/supabase/client";
+import { identifySentryUser } from "@/lib/errorContext";
 
 export default function PosthogProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -46,6 +47,11 @@ export default function PosthogProvider({ children }: { children: React.ReactNod
         plan: profile?.subscription_status ?? "free",
         created_at: profile?.created_at ?? user.created_at,
         trips_count: tripsCount ?? 0,
+      });
+      identifySentryUser({
+        id: user.id,
+        email: user.email,
+        plan: profile?.subscription_status ?? "free",
       });
     });
   }, []);

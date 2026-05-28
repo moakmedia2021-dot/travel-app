@@ -9,6 +9,7 @@ import { fileToDataURL } from "@/lib/cropImage";
 import CountriesPicker from "./CountriesPicker";
 import { createClient } from "@/lib/supabase/client";
 import { resetUser } from "@/lib/analytics";
+import { clearSentryUser } from "@/lib/errorContext";
 
 type Props = {
   initial: ProfileUpdate & { id: string; email: string | null };
@@ -325,6 +326,7 @@ export default function ProfileEditor({ initial, isAdmin = false }: Props) {
               const supabase = createClient();
               await supabase.auth.signOut();
               resetUser();
+              clearSentryUser();
               router.push("/login");
               router.refresh();
             }}
