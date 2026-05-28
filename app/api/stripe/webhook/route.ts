@@ -4,6 +4,7 @@ import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { createServiceClient } from "@/lib/supabase/service";
 import { reportStripeError } from "@/lib/errorContext";
+import { logger } from "@/lib/logger";
 
 export const runtime = "nodejs";
 
@@ -42,7 +43,7 @@ export async function POST(req: Request) {
     return new NextResponse("Invalid signature", { status: 400 });
   }
 
-  console.log(`[stripe webhook] received ${event.type}`);
+  logger.info("stripe webhook", `received ${event.type}`);
 
   let supabase;
   try {
@@ -60,7 +61,7 @@ export async function POST(req: Request) {
         const subId = session.subscription as string | null;
         const customerId = session.customer as string | null;
 
-        console.log("[stripe webhook] checkout.session.completed", {
+        logger.info("stripe webhook", "checkout.session.completed", {
           userId,
           subId,
           customerId,
@@ -87,9 +88,9 @@ export async function POST(req: Request) {
           })
           .eq("id", userId);
         if (error) {
-          console.error("[stripe webhook] update profile failed", error);
+          logger.error("stripe webhook", "update profile failed", error);
         } else {
-          console.log("[stripe webhook] profile updated to premium", userId);
+          logger.info("stripe webhook", "profile updated to premium", { userId });
         }
         break;
       }

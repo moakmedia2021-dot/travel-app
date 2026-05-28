@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { enforceRateLimit, standardLimit } from "@/lib/ratelimit";
 import packageJson from "../../../package.json";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +15,10 @@ type HealthStatus = {
   uptime_seconds?: number;
 };
 
-export async function GET() {
+export async function GET(req: Request) {
+  const limited = await enforceRateLimit(req, standardLimit);
+  if (limited) return limited;
+
   const timestamp = new Date().toISOString();
   let supabaseStatus: HealthStatus["supabase"] = "connected";
   let supabaseError: string | undefined;

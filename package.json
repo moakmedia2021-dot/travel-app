@@ -16,6 +16,8 @@
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.106.1",
     "@types/react-simple-maps": "^3.0.6",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.0",
     "d3-geo": "^3.1.1",
     "next": "14.2.29",
     "posthog-js": "^1.376.3",

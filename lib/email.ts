@@ -1,6 +1,7 @@
 // Resend wrapper. If RESEND_API_KEY is not set, sending is a no-op (logged
 // to console). The caller always also shows the invite link in the UI so
 // the host can copy/paste it manually until email is configured.
+import { logger } from "@/lib/logger";
 
 type SendInviteArgs = {
   to: string;
@@ -14,8 +15,10 @@ export async function sendInviteEmail(args: SendInviteArgs): Promise<{ ok: boole
   const fromAddress = process.env.RESEND_FROM_EMAIL || "Travel App <onboarding@resend.dev>";
 
   if (!apiKey) {
-    console.log("[email] RESEND_API_KEY not set — skipping send.");
-    console.log(`[email] would have sent to ${args.to}: ${args.inviteUrl}`);
+    logger.info("email", "RESEND_API_KEY not set — skipping send", {
+      to: args.to,
+      url: args.inviteUrl,
+    });
     return { ok: true };
   }
 

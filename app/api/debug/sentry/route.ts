@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
+import { enforceRateLimit, strictLimit } from "@/lib/ratelimit";
 
 // One-off debug endpoint to verify the Sentry server SDK is wired up
 // correctly. Visit /api/debug/sentry → check Sentry within ~30 seconds.
@@ -7,7 +8,10 @@ import * as Sentry from "@sentry/nextjs";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export async function GET() {
+export async function GET(req: Request) {
+  const limited = await enforceRateLimit(req, strictLimit);
+  if (limited) return limited;
+
   const dsnSet = !!process.env.NEXT_PUBLIC_SENTRY_DSN;
   const dsnPrefix = process.env.NEXT_PUBLIC_SENTRY_DSN?.slice(0, 24) ?? null;
 
