@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import ProfileEditor from "@/components/profile/ProfileEditor";
+import { isAdmin } from "@/lib/admin";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -17,6 +18,7 @@ export default async function ProfilePage() {
 
   return (
     <ProfileEditor
+      isAdmin={isAdmin(user.id)}
       initial={{
         id: user.id,
         email: user.email ?? null,

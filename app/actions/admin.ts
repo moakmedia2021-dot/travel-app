@@ -12,21 +12,26 @@ const ADMIN_PORTAL_PASSWORD = process.env.ADMIN_PORTAL_PASSWORD || "moakmedia21"
 const COOKIE_NAME = "admin_unlocked";
 const COOKIE_TTL_HOURS = 24;
 
+/**
+ * Server action used from the PasswordGate form.
+ * - Returns `{ error }` on wrong password / no admin.
+ * - On success, sets the cookie then redirects so the page re-renders
+ *   with the cookie attached (more reliable than client-side refresh).
+ */
 export async function unlockAdminPortal(
   password: string
-): Promise<{ ok: true } | { ok: false; error: string }> {
+): Promise<{ error: string } | void> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!isAdmin(user?.id)) {
-    // Don't even hint that the page exists for non-admins
-    return { ok: false, error: "Not found" };
+    return { error: "Not found" };
   }
 
   if (password !== ADMIN_PORTAL_PASSWORD) {
-    return { ok: false, error: "Incorrect password" };
+    return { error: "Incorrect password" };
   }
 
   const store = await cookies();
@@ -35,10 +40,10 @@ export async function unlockAdminPortal(
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     maxAge: 60 * 60 * COOKIE_TTL_HOURS,
-    path: "/admin",
+    path: "/",
   });
 
-  return { ok: true };
+  redirect("/admin/analytics");
 }
 
 export async function lockAdminPortal() {

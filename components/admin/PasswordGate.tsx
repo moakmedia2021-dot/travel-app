@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { unlockAdminPortal } from "@/app/actions/admin";
 
 export default function PasswordGate() {
-  const router = useRouter();
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -14,13 +12,13 @@ export default function PasswordGate() {
     e.preventDefault();
     setBusy(true);
     setError(null);
+    // On success the server action redirects, so this call doesn't return.
+    // On failure it returns { error } and we handle it here.
     const result = await unlockAdminPortal(password);
-    setBusy(false);
-    if (!result.ok) {
+    if (result && "error" in result) {
       setError(result.error);
-      return;
+      setBusy(false);
     }
-    router.refresh();
   }
 
   return (

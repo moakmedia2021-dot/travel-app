@@ -12,9 +12,10 @@ import { resetUser } from "@/lib/analytics";
 
 type Props = {
   initial: ProfileUpdate & { id: string; email: string | null };
+  isAdmin?: boolean;
 };
 
-export default function ProfileEditor({ initial }: Props) {
+export default function ProfileEditor({ initial, isAdmin = false }: Props) {
   const router = useRouter();
   const [form, setForm] = useState({
     full_name: initial.full_name ?? "",
@@ -260,6 +261,31 @@ export default function ProfileEditor({ initial }: Props) {
             Manage settings, billing, and notifications.
           </p>
         </div>
+
+        {isAdmin && (
+          <a
+            href="/admin/analytics"
+            className="flex h-14 items-center justify-between border-b border-neutral-100 bg-amber-50/40 px-5 text-sm font-medium text-amber-900 hover:bg-amber-50"
+          >
+            <span className="flex items-center gap-3">
+              <span className="flex h-7 w-7 items-center justify-center rounded-md bg-amber-200/60 text-amber-900">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" />
+                  <path d="M7 11V7a5 5 0 0110 0v4" />
+                </svg>
+              </span>
+              <span>
+                Admin portal
+                <span className="ml-2 rounded-full bg-amber-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-900">
+                  Owner
+                </span>
+              </span>
+            </span>
+            <svg className="h-4 w-4 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        )}
 
         <a
           href="/settings"
