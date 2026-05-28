@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { isAdmin } from "@/lib/admin";
+import { isAdminUnlocked, lockAdminPortal } from "@/app/actions/admin";
+import PasswordGate from "@/components/admin/PasswordGate";
 import AnalyticsCharts, { type DayCount } from "@/components/admin/AnalyticsCharts";
 
 export const dynamic = "force-dynamic";
@@ -39,6 +41,11 @@ export default async function AdminAnalyticsPage() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!isAdmin(user?.id)) notFound();
+
+  // Password gate — show form until unlocked for this session
+  if (!(await isAdminUnlocked())) {
+    return <PasswordGate />;
+  }
 
   // Use service client to bypass RLS for admin queries
   const service = (() => {
@@ -121,11 +128,22 @@ export default async function AdminAnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-neutral-900">Analytics</h1>
-        <p className="mt-1 text-sm text-neutral-500">
-          Internal admin view. Page views & event funnels live in PostHog.
-        </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-neutral-900">Analytics</h1>
+          <p className="mt-1 text-sm text-neutral-500">
+            Internal admin view. Page views & event funnels live in PostHog.
+          </p>
+        </div>
+        <form action={lockAdminPortal}>
+          <button
+            type="submit"
+            className="rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50"
+            title="Re-lock the portal"
+          >
+            🔒 Lock
+          </button>
+        </form>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

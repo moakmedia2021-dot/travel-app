@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { DiscoverTraveler } from "@/lib/types";
 import TravelerCard from "./TravelerCard";
+import UsernameSearch from "./UsernameSearch";
 import { sendConnectionRequest } from "@/app/actions/social";
 import { track } from "@/lib/analytics";
 import { useEffect } from "react";
@@ -17,7 +18,10 @@ export default function DiscoverView({ travelers }: { travelers: DiscoverTravele
 
   if (travelers.length === 0) {
     return (
-      <EmptyState />
+      <div className="space-y-4">
+        <UsernameSearch />
+        <EmptyState />
+      </div>
     );
   }
 
@@ -78,6 +82,7 @@ export default function DiscoverView({ travelers }: { travelers: DiscoverTravele
 
   return (
     <div className="space-y-4">
+      <UsernameSearch />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-neutral-900">Discover travelers</h1>
