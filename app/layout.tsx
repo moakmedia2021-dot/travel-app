@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Toaster from "@/components/ui/Toaster";
+import PosthogProvider from "@/components/PosthogProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,7 +31,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body>
-        {children}
+        <Suspense fallback={null}>
+          <PosthogProvider>{children}</PosthogProvider>
+        </Suspense>
         <Toaster />
       </body>
     </html>

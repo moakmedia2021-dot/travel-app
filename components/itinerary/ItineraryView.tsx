@@ -22,6 +22,7 @@ import {
   reorderItineraryItems,
   type ItineraryInput,
 } from "@/app/actions/itinerary";
+import { track } from "@/lib/analytics";
 
 type Props = {
   tripId: string;
@@ -107,6 +108,7 @@ export default function ItineraryView({
         setError(result.error);
         throw new Error(result.error);
       }
+      track("itinerary_item_added", { type: input.type, day_number: input.day_number });
       router.refresh();
     } else if (slideOver.item) {
       const itemId = slideOver.item.id;

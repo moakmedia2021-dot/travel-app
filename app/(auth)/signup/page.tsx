@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { track } from "@/lib/analytics";
 
 function safeNext(raw: string | null): string {
   if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/dashboard";
@@ -44,11 +45,13 @@ export default function SignupPage() {
       return;
     }
 
+    track("signup_completed", { method: "email" });
     setVerifyPrompt(true);
     setLoading(false);
   }
 
   async function handleGoogleSignup() {
+    track("signup_started", { method: "google" });
     const n = currentNext();
     await supabase.auth.signInWithOAuth({
       provider: "google",

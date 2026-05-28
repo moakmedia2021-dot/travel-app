@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { startCheckout, openCustomerPortal } from "@/app/actions/billing";
+import { track } from "@/lib/analytics";
 
 type Props = {
   status: "free" | "premium" | "cancelled";
@@ -38,8 +39,10 @@ export default function BillingPanel({ status, isPremium, periodEnd, stripeConfi
     if (!s) return;
     if (s === "success") {
       toast.success("Welcome to Premium! Your account has been upgraded.");
+      track("subscription_started");
     } else if (s === "cancelled") {
       toast.info("Checkout cancelled — no changes made.");
+      track("subscription_checkout_cancelled");
     }
     // Clean the URL so the toast doesn't fire on refresh
     const url = new URL(window.location.href);
@@ -49,6 +52,7 @@ export default function BillingPanel({ status, isPremium, periodEnd, stripeConfi
 
   async function go(plan: "monthly" | "annual") {
     setBusy(plan);
+    track("upgrade_clicked", { plan });
     const result = await startCheckout(plan);
     setBusy(null);
     if (result && !result.ok) toast.error(result.error);

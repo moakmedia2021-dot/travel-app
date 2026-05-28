@@ -6,6 +6,8 @@ import Link from "next/link";
 import type { DiscoverTraveler } from "@/lib/types";
 import TravelerCard from "./TravelerCard";
 import { sendConnectionRequest } from "@/app/actions/social";
+import { track } from "@/lib/analytics";
+import { useEffect } from "react";
 
 export default function DiscoverView({ travelers }: { travelers: DiscoverTraveler[] }) {
   const router = useRouter();
@@ -41,6 +43,17 @@ export default function DiscoverView({ travelers }: { travelers: DiscoverTravele
 
   const current = travelers[idx];
 
+  // Track card view whenever the current traveler changes
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    if (current) {
+      track("discover_card_viewed", {
+        destination: current.destination ?? null,
+        score: current.score,
+      });
+    }
+  }, [current?.user_id, current?.destination, current?.score, current]);
+
   async function handleConnect() {
     setBusy(true);
     const r = await sendConnectionRequest(current.user_id, null);
@@ -48,6 +61,10 @@ export default function DiscoverView({ travelers }: { travelers: DiscoverTravele
     if (!r.ok) {
       setLastAction(`Couldn't connect: ${r.error}`);
     } else {
+      track("discover_card_connected", {
+        destination: current.destination ?? null,
+        target_id: current.user_id,
+      });
       setLastAction(`Sent request to ${current.full_name || current.username || "them"} ✓`);
       router.refresh();
     }

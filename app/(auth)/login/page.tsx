@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { track } from "@/lib/analytics";
 
 function safeNext(raw: string | null): string {
   // Only allow same-origin relative paths
@@ -38,11 +39,13 @@ export default function LoginPage() {
       return;
     }
 
+    track("login_completed", { method: "email" });
     router.push(currentNext());
     router.refresh();
   }
 
   async function handleGoogleLogin() {
+    track("login_started", { method: "google" });
     const n = currentNext();
     await supabase.auth.signInWithOAuth({
       provider: "google",

@@ -15,6 +15,7 @@ import {
   deleteExpense,
   type ExpenseInput,
 } from "@/app/actions/expenses";
+import { track } from "@/lib/analytics";
 
 type Props = {
   tripId: string;
@@ -66,6 +67,12 @@ export default function BudgetView({
         setError(result.error);
         throw new Error(result.error);
       }
+      track("expense_added", {
+        category: input.category,
+        is_group_trip: members.length > 1,
+        amount: input.amount,
+        currency: input.currency,
+      });
       router.refresh();
     } else if (slideOver.expense) {
       const result = await updateExpense(tripId, slideOver.expense.id, input);

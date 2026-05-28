@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { FlightOffer } from "@/lib/duffel";
 import { searchFlightsAction, addFlightToTrip } from "@/app/actions/deals";
 import { formatMoney } from "@/lib/currencies";
+import { track } from "@/lib/analytics";
 import DestinationCombobox from "./DestinationCombobox";
 import HomeAirportPrompt from "./HomeAirportPrompt";
 
@@ -59,6 +60,7 @@ export default function FlightSearchPanel({
     setLoading(true);
     setError(null);
     setResults(null);
+    track("deal_searched", { type: "flight", origin, destination: destIata });
     const r = await searchFlightsAction({
       origin,
       destination: destIata,
@@ -83,7 +85,9 @@ export default function FlightSearchPanel({
       departureDate: depart,
     });
     setAddingId(null);
-    if (!r.ok) {
+    if (r.ok) {
+      track("deal_added_to_trip", { type: "flight", price: offer.totalPrice });
+    } else if (!r.ok) {
       alert(r.error);
       return;
     }

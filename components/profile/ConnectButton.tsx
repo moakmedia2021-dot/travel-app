@@ -8,6 +8,7 @@ import {
   removeConnection,
 } from "@/app/actions/social";
 import SheetHandle from "@/components/ui/SheetHandle";
+import { track } from "@/lib/analytics";
 
 type Connection = {
   id: string;
@@ -38,6 +39,7 @@ export default function ConnectButton({ targetId, currentUserId, connection }: P
       setError(r.error);
       return;
     }
+    track("connection_requested", { target_id: targetId, has_message: message.trim().length > 0 });
     setShowModal(false);
     setMessage("");
     router.refresh();

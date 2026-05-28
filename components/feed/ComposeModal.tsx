@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPost, uploadPostImage } from "@/app/actions/posts";
 import SheetHandle from "@/components/ui/SheetHandle";
+import { track } from "@/lib/analytics";
 
 type Props = {
   open: boolean;
@@ -59,6 +60,11 @@ export default function ComposeModal({ open, onClose, trips }: Props) {
       setError(r.error);
       return;
     }
+    track("trip_post_created", {
+      has_image: !!imageUrl,
+      has_location: location.trim().length > 0,
+      has_trip: !!tripId,
+    });
     setContent("");
     setLocation("");
     setTripId("");

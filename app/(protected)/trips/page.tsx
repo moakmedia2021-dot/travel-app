@@ -51,6 +51,7 @@ export default async function TripsPage() {
         <UpgradeBanner
           title="You've reached 3 active trips"
           message="Free plan is limited to 3 active trips. Upgrade to Premium for unlimited."
+          feature="trip_limit"
         />
       )}
 

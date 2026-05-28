@@ -6,6 +6,7 @@ import { createTrip } from "@/app/actions/trips";
 import { CURRENCIES } from "@/lib/currencies";
 import type { TripVisibility } from "@/lib/types";
 import SheetHandle from "@/components/ui/SheetHandle";
+import { track } from "@/lib/analytics";
 
 type Props = {
   open: boolean;
@@ -116,6 +117,11 @@ export default function NewTripModal({ open, onClose }: Props) {
       return;
     }
 
+    track("trip_created", {
+      destination: form.destination || null,
+      is_group: form.visibility !== "private",
+      visibility: form.visibility,
+    });
     router.push(`/trips/${result.id}`);
     router.refresh();
   }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { followUser, unfollowUser } from "@/app/actions/social";
+import { track } from "@/lib/analytics";
 
 type Props = {
   targetId: string;
@@ -23,6 +24,7 @@ export default function FollowButton({ targetId, initialFollowing }: Props) {
       setFollowing(!next); // revert
       alert(result.error);
     } else {
+      track(next ? "user_followed" : "user_unfollowed", { target_id: targetId });
       router.refresh();
     }
     setBusy(false);
