@@ -32,6 +32,19 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
+  // Waitlist mode: signup is closed; redirect /signup to the landing page.
+  // Magic-link signups still pass through /auth/callback so existing waitlist
+  // grants keep working.
+  if (
+    (process.env.WAITLIST_MODE === "true" || process.env.WAITLIST_MODE === "1") &&
+    pathname === "/signup"
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
   const isAuthRoute = pathname === "/login" || pathname === "/signup";
   const isOnboardingRoute = pathname.startsWith("/onboarding");
 
