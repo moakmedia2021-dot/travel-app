@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isAdmin } from "@/lib/admin";
 import { isAdminUnlocked, lockAdminPortal } from "@/app/actions/admin";
 import PasswordGate from "@/components/admin/PasswordGate";
+import AdminNav from "@/components/admin/AdminNav";
 import WaitlistManager from "@/components/admin/WaitlistManager";
 import { listWaitlist } from "@/app/actions/waitlist";
 
@@ -26,14 +26,8 @@ export default async function AdminWaitlistPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2 text-sm text-neutral-500">
-            <Link href="/admin/analytics" className="hover:text-neutral-900">
-              Admin
-            </Link>
-            <span>›</span>
-            <span className="text-neutral-700">Waitlist</span>
-          </div>
-          <h1 className="mt-1 text-2xl font-semibold text-neutral-900">Waitlist</h1>
+          <h1 className="text-2xl font-semibold text-neutral-900">Admin</h1>
+          <p className="mt-1 text-sm text-neutral-500">Internal admin tools.</p>
         </div>
         <form action={lockAdminPortal}>
           <button
@@ -43,6 +37,15 @@ export default async function AdminWaitlistPage() {
             🔒 Lock
           </button>
         </form>
+      </div>
+
+      <AdminNav />
+
+      <div>
+        <h2 className="text-lg font-semibold text-neutral-900">Waitlist</h2>
+        <p className="mt-0.5 text-sm text-neutral-500">
+          Grant beta access manually or in bulk by current position.
+        </p>
       </div>
 
       <WaitlistManager initial={rows} />
