@@ -32,9 +32,9 @@ export default function Navbar({ user, profile }: Props) {
         {/* Logo */}
         <Link
           href={user ? "/dashboard" : "/"}
-          className="text-base font-semibold tracking-tight text-neutral-900 sm:text-lg"
+          className="text-base font-bold tracking-tight text-neutral-900 sm:text-lg"
         >
-          Travel App
+          Get<span className="text-blue-600">Goin</span>
         </Link>
 
         {/* Desktop nav links (hidden on mobile — bottom tab bar takes over) */}

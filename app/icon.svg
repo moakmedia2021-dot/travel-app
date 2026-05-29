@@ -1,0 +1,6 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="8" fill="#171717"/>
+  <text x="15" y="16" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+        font-size="20" font-weight="800" fill="#ffffff" text-anchor="middle" dominant-baseline="central">G</text>
+  <path d="M21.5 7.5 L26.5 9.5 L21.5 11.5 L22.7 9.5 Z" fill="#2563eb"/>
+</svg>

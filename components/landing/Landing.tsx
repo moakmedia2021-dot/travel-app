@@ -8,8 +8,8 @@ type Props = {
 
 const FEATURES = [
   {
-    title: "Trip Planning",
-    desc: "Drag-and-drop itineraries with flights, hotels, and activities. Stay organized day by day, with weather, maps, and budget all in one place.",
+    title: "One plan, everyone on it",
+    desc: "Drag-and-drop itineraries with flights, hotels, and activities. Weather, maps, and budget live right alongside the plan — and everyone sees updates in real time.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="4" width="18" height="18" rx="2" />
@@ -18,8 +18,8 @@ const FEATURES = [
     ),
   },
   {
-    title: "Group Trips",
-    desc: "Invite friends, split costs automatically, and settle up like Splitwise. Everyone sees the same itinerary and contributes to the plan.",
+    title: "Split it without the drama",
+    desc: "Invite friends, log shared costs, and settle up clean — no spreadsheet, no awkward Venmo reminders. Everyone pays their share and moves on.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="9" cy="8" r="4" />
@@ -29,8 +29,8 @@ const FEATURES = [
     ),
   },
   {
-    title: "Deal Finder",
-    desc: "Real-time flight and hotel prices from the same APIs used by major booking sites. Save deals straight into your itinerary and budget.",
+    title: "Deals, found for you",
+    desc: "Live flight and hotel prices from the same sources the big booking sites use. Spot a good one, drop it straight into the itinerary and budget.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" />
@@ -66,15 +66,15 @@ export default function Landing({ waitlistCount, referralCode }: Props) {
             Early access · invite only
           </span>
           <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
-            Plan trips together.
+            The group chat
             <br />
-            Meet travelers.
+            that actually
             <br />
-            <span className="text-neutral-500">Find the best deals.</span>
+            <span className="text-neutral-500">books the trip.</span>
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-base text-neutral-600 sm:text-lg">
-            The travel planner built for groups. Itineraries, budgets, and deal alerts —
-            all in one place. Coming soon.
+            Plan it together, split the costs, and catch the deals — all in one place.
+            No more 200-message threads and a trip that never happens.
           </p>
 
           <div className="mx-auto mt-8 max-w-lg text-left">
@@ -97,7 +97,7 @@ export default function Landing({ waitlistCount, referralCode }: Props) {
       <section className="border-t border-neutral-200 bg-white px-4 py-16 sm:py-20">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-center text-xs font-semibold uppercase tracking-wide text-neutral-500">
-            Everything you need to plan
+            Everything the trip needs, in one place
           </h2>
           <div className="mt-8 grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-3">
             {FEATURES.map((f) => (
@@ -165,8 +165,8 @@ function Header() {
   return (
     <header className="border-b border-neutral-200 bg-white">
       <nav className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:h-16 sm:px-6 lg:px-8">
-        <Link href="/" className="text-base font-semibold tracking-tight sm:text-lg">
-          Travel App
+        <Link href="/" className="text-base font-bold tracking-tight sm:text-lg">
+          Get<span className="text-blue-600">Goin</span>
         </Link>
         <a href="#join" className="text-sm font-medium text-neutral-600 hover:text-neutral-900">
           Join waitlist
@@ -180,7 +180,7 @@ function Footer() {
   return (
     <footer className="border-t border-neutral-200 bg-white px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 sm:flex-row">
-        <p className="text-xs text-neutral-500">© {new Date().getFullYear()} Travel App</p>
+        <p className="text-xs text-neutral-500">© {new Date().getFullYear()} GetGoin</p>
         <div className="flex items-center gap-5 text-sm text-neutral-500">
           <a
             href="https://twitter.com/"

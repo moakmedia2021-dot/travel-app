@@ -38,8 +38,8 @@ export default async function PersonalWaitlistPage({
     <div className="min-h-screen bg-neutral-50 text-neutral-900">
       <header className="border-b border-neutral-200 bg-white">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:h-16 sm:px-6">
-          <Link href="/" className="text-base font-semibold tracking-tight sm:text-lg">
-            Travel App
+          <Link href="/" className="text-base font-bold tracking-tight sm:text-lg">
+            Get<span className="text-blue-600">Goin</span>
           </Link>
           <span className="text-xs font-medium text-neutral-500">Waitlist</span>
         </div>

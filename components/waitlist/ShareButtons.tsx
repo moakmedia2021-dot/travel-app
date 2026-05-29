@@ -9,7 +9,7 @@ type Props = {
 
 export default function ShareButtons({
   referralLink,
-  shareText = "I just joined the Travel App waitlist — group trip planning + deal finder. Join me:",
+  shareText = "Just got on the GetGoin waitlist — plan group trips, split costs, catch deals. Come get goin' with me:",
 }: Props) {
   const [copied, setCopied] = useState(false);
 

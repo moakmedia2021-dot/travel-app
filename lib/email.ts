@@ -12,7 +12,7 @@ type SendInviteArgs = {
 
 export async function sendInviteEmail(args: SendInviteArgs): Promise<{ ok: boolean; error?: string }> {
   const apiKey = process.env.RESEND_API_KEY;
-  const fromAddress = process.env.RESEND_FROM_EMAIL || "Travel App <onboarding@resend.dev>";
+  const fromAddress = process.env.RESEND_FROM_EMAIL || "GetGoin <onboarding@resend.dev>";
 
   if (!apiKey) {
     logger.info("email", "RESEND_API_KEY not set — skipping send", {
@@ -28,7 +28,7 @@ export async function sendInviteEmail(args: SendInviteArgs): Promise<{ ok: boole
       <h2 style="margin: 0 0 8px;">You've been invited to a trip</h2>
       <p style="color: #525252; margin: 0 0 24px;">
         <strong>${escapeHtml(args.inviterName)}</strong> invited you to join
-        <strong>${escapeHtml(args.tripTitle)}</strong> on Travel App.
+        <strong>${escapeHtml(args.tripTitle)}</strong> on GetGoin.
       </p>
       <a href="${args.inviteUrl}"
          style="display: inline-block; background: #171717; color: white; padding: 12px 20px;

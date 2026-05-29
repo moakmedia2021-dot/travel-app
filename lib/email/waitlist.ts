@@ -5,7 +5,7 @@ import { logger } from "@/lib/logger";
 type SendResult = { ok: true } | { ok: false; error: string };
 
 function fromAddress(): string {
-  return process.env.RESEND_FROM_EMAIL || "Travel App <onboarding@resend.dev>";
+  return process.env.RESEND_FROM_EMAIL || "GetGoin <onboarding@resend.dev>";
 }
 
 function siteUrl(): string {
@@ -45,7 +45,7 @@ async function sendEmail(args: { to: string; subject: string; html: string }): P
 const wrap = (innerHtml: string) => `
 <div style="font-family:-apple-system,system-ui,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#171717;">
   ${innerHtml}
-  <p style="margin-top:32px;color:#a3a3a3;font-size:12px;">Travel App · plan trips together</p>
+  <p style="margin-top:32px;color:#a3a3a3;font-size:12px;">GetGoin · plan trips together</p>
 </div>`;
 
 const button = (href: string, label: string) => `
@@ -73,8 +73,8 @@ export async function sendWaitlistWelcomeEmail(args: {
     <h1 style="margin:0 0 12px;font-size:24px;">You're on the list 🎉</h1>
     <p style="margin:0 0 16px;color:#525252;font-size:15px;line-height:1.6;">${greeting}</p>
     <p style="margin:0 0 24px;color:#525252;font-size:15px;line-height:1.6;">
-      You're <strong style="color:#171717;">#${args.position}</strong> on the waitlist for Travel App.
-      We'll email you when your spot opens.
+      You're <strong style="color:#171717;">#${args.position}</strong> on the waitlist for GetGoin.
+      We'll email you the moment your spot opens.
     </p>
     <div style="background:#f5f5f5;border-radius:8px;padding:16px 20px;margin:0 0 24px;">
       <p style="margin:0 0 8px;font-size:13px;color:#737373;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Move up the list</p>
@@ -84,7 +84,7 @@ export async function sendWaitlistWelcomeEmail(args: {
     <div style="margin:0 0 16px;">${button(personalPage, "View my waitlist page")}</div>
   `);
 
-  return sendEmail({ to: args.to, subject: "You're on the Travel App waitlist", html });
+  return sendEmail({ to: args.to, subject: "You're on the GetGoin waitlist", html });
 }
 
 export async function sendAccessGrantedEmail(args: {
@@ -97,7 +97,7 @@ export async function sendAccessGrantedEmail(args: {
     <h1 style="margin:0 0 12px;font-size:24px;">Your spot is ready 🛫</h1>
     <p style="margin:0 0 16px;color:#525252;font-size:15px;line-height:1.6;">${greeting}</p>
     <p style="margin:0 0 24px;color:#525252;font-size:15px;line-height:1.6;">
-      You've been granted early access to Travel App. Use the link below to set up your account.
+      You're in. Early access to GetGoin is yours — use the link below to set up your account.
     </p>
     <div style="margin:0 0 24px;">${button(args.magicLink, "Set up my account")}</div>
     <p style="margin:0;color:#a3a3a3;font-size:12px;line-height:1.5;">
@@ -105,5 +105,5 @@ export async function sendAccessGrantedEmail(args: {
     </p>
   `);
 
-  return sendEmail({ to: args.to, subject: "Your Travel App access is ready", html });
+  return sendEmail({ to: args.to, subject: "Your GetGoin access is ready", html });
 }

@@ -53,20 +53,20 @@ export async function generateMetadata({
   const { slug } = await params;
   const dest = await loadDestination(slug);
   const name = dest?.destination ?? titleCase(slug);
-  const description = `Discover ${name}: real trip itineraries, travel tips, and travelers planning trips here on Travel App.`;
+  const description = `Discover ${name}: real trip itineraries, travel tips, and travelers planning trips here on GetGoin.`;
   const url = `${siteUrl()}/destination/${slug}`;
   return {
     title: `${name} — Travel guide & itineraries`,
     description,
     openGraph: {
-      title: `${name} on Travel App`,
+      title: `${name} on GetGoin`,
       description,
       url,
       type: "website",
     },
     twitter: {
       card: "summary",
-      title: `${name} on Travel App`,
+      title: `${name} on GetGoin`,
       description,
     },
     alternates: { canonical: url },

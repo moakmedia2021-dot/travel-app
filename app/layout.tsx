@@ -12,8 +12,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Travel App",
-  description: "Plan and track your travels",
+  title: {
+    default: "GetGoin",
+    template: "%s · GetGoin",
+  },
+  description: "Plan trips together, find your people, and book the trip. GetGoin.",
 };
 
 export const viewport = {

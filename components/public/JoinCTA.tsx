@@ -18,7 +18,7 @@ export default function JoinCTA({ name, message }: Props) {
         <div>
           <h3 className="text-lg font-semibold sm:text-xl">{headline}</h3>
           <p className="mt-1 text-sm text-neutral-200">
-            Join Travel App free — plan trips, find travelers on the same route, share itineraries.
+            GetGoin is free — plan trips, find travelers on your route, and share itineraries.
           </p>
         </div>
         <div className="flex shrink-0 gap-2">

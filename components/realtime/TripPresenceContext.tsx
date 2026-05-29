@@ -29,10 +29,8 @@ type Ctx = {
 
 const TripPresenceContext = createContext<Ctx | null>(null);
 
-export function useTripPresence(): Ctx {
-  const v = useContext(TripPresenceContext);
-  if (!v) throw new Error("useTripPresence must be inside <TripPresenceProvider>");
-  return v;
+export function useTripPresence(): Ctx | null {
+  return useContext(TripPresenceContext);
 }
 
 type Props = {

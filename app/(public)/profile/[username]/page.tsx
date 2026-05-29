@@ -36,14 +36,14 @@ export async function generateMetadata({
   const name = profile.full_name || profile.username || "Traveler";
   const description = profile.bio
     ? truncate(profile.bio, 160)
-    : `${name}${profile.home_city ? ` · ${profile.home_city}` : ""} on Travel App`;
+    : `${name}${profile.home_city ? ` · ${profile.home_city}` : ""} on GetGoin`;
   const url = `${siteUrl()}/profile/${username}`;
 
   return {
     title: `${name} — Travel Profile`,
     description,
     openGraph: {
-      title: `${name} on Travel App`,
+      title: `${name} on GetGoin`,
       description,
       url,
       type: "profile",
@@ -51,7 +51,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: profile.avatar_url ? "summary_large_image" : "summary",
-      title: `${name} on Travel App`,
+      title: `${name} on GetGoin`,
       description,
       images: profile.avatar_url ? [profile.avatar_url] : [],
     },

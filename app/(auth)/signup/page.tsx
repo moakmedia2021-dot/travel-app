@@ -85,9 +85,9 @@ export default function SignupPage() {
     <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-semibold text-neutral-900">Create account</h1>
+          <h1 className="text-2xl font-semibold text-neutral-900">Let&apos;s get goin&apos;</h1>
           <p className="mt-1 text-sm text-neutral-500">
-            Start planning your travels
+            Create your account — the next trip starts here.
           </p>
         </div>
 

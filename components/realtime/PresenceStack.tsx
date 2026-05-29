@@ -7,9 +7,11 @@ import { ringForUser } from "@/lib/realtime/presenceColors";
 type Props = { max?: number };
 
 export default function PresenceStack({ max = 5 }: Props) {
-  const { presentUsers, currentUserId } = useTripPresence();
+  const presence = useTripPresence();
 
-  if (presentUsers.length === 0) return null;
+  if (!presence || presence.presentUsers.length === 0) return null;
+
+  const { presentUsers, currentUserId } = presence;
 
   // Sort: current user first, then by name
   const sorted = [...presentUsers].sort((a, b) => {

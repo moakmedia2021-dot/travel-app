@@ -14,9 +14,9 @@ export default function PublicNav({ user, profile }: Props) {
       <nav className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:h-16 sm:px-6 lg:px-8">
         <Link
           href={user ? "/dashboard" : "/"}
-          className="text-base font-semibold tracking-tight text-neutral-900 sm:text-lg"
+          className="text-base font-bold tracking-tight text-neutral-900 sm:text-lg"
         >
-          Travel App
+          Get<span className="text-blue-600">Goin</span>
         </Link>
 
         {user ? (
