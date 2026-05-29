@@ -156,7 +156,7 @@ export default async function AdminAnalyticsPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
         <Stat label="Total users" value={totalUserCount.toString()} />
         <Stat label="Active (7d)" value={activeUserCount.toString()} />
         <Stat

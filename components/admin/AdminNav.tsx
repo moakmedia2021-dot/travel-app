@@ -11,7 +11,7 @@ const TABS = [
 export default function AdminNav() {
   const pathname = usePathname();
   return (
-    <nav className="border-b border-neutral-200">
+    <nav className="-mx-4 overflow-x-auto border-b border-neutral-200 px-4 sm:mx-0 sm:px-0">
       <div className="-mb-px flex gap-4">
         {TABS.map((tab) => {
           const active = pathname === tab.href || pathname.startsWith(tab.href + "/");

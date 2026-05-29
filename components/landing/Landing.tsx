@@ -65,7 +65,7 @@ export default function Landing({ waitlistCount, referralCode }: Props) {
           <span className="inline-block rounded-full border border-neutral-300 bg-white px-3 py-1 text-xs font-medium uppercase tracking-wide text-neutral-600">
             Early access · invite only
           </span>
-          <h1 className="mt-5 text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
+          <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
             Plan trips together.
             <br />
             Meet travelers.
