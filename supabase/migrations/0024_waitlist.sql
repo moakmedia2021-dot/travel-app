@@ -21,18 +21,20 @@ create index if not exists idx_waitlist_email_lower  on public.waitlist (lower(e
 alter table public.waitlist enable row level security;
 
 -- All writes go through SECURITY DEFINER RPCs.
--- No public select policy — reads are only via waitlist_get(code) RPC.
 
 -- ---------------------------------------------------------------------
 -- Public RPCs
 -- ---------------------------------------------------------------------
+-- NOTE: "position" is a reserved word in PostgreSQL (it's the built-in
+-- substring-position function), so RETURNS TABLE columns named `position`
+-- must be double-quoted.
 
 create or replace function public.waitlist_join(
   p_email       text,
   p_name        text,
   p_referred_by varchar default null
 )
-returns table (referral_code varchar, position int, already_on boolean)
+returns table (referral_code varchar, "position" int, already_on boolean)
 language plpgsql
 security definer
 set search_path = public
@@ -82,7 +84,7 @@ create or replace function public.waitlist_get(p_code varchar)
 returns table (
   referral_code   varchar,
   name            text,
-  position        int,
+  "position"      int,
   referrals_count int,
   granted_access  boolean,
   created_at      timestamptz
