@@ -7,6 +7,7 @@ import { MemberAvatar } from "@/components/budget/MemberAvatar";
 import AvatarCropper from "./AvatarCropper";
 import { fileToDataURL } from "@/lib/cropImage";
 import CountriesPicker from "./CountriesPicker";
+import WorldMap from "./WorldMap";
 import { createClient } from "@/lib/supabase/client";
 import { resetUser } from "@/lib/analytics";
 import { clearSentryUser } from "@/lib/errorContext";
@@ -228,12 +229,27 @@ export default function ProfileEditor({ initial, isAdmin = false }: Props) {
         </Field>
 
         <Field label="Countries visited" hint={`${form.countries_visited.length} selected`}>
-          <CountriesPicker
-            selected={form.countries_visited}
-            onChange={(arr) =>
-              setForm((f) => ({ ...f, countries_visited: arr }))
-            }
-          />
+          <div className="space-y-2">
+            <WorldMap
+              visited={form.countries_visited}
+              height={240}
+              onToggle={(code) =>
+                setForm((f) => ({
+                  ...f,
+                  countries_visited: f.countries_visited.includes(code)
+                    ? f.countries_visited.filter((c) => c !== code)
+                    : [...f.countries_visited, code],
+                }))
+              }
+            />
+            <p className="text-xs text-neutral-400">Tap a country on the map, or search below.</p>
+            <CountriesPicker
+              selected={form.countries_visited}
+              onChange={(arr) =>
+                setForm((f) => ({ ...f, countries_visited: arr }))
+              }
+            />
+          </div>
         </Field>
 
         {error && (

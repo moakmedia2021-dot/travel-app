@@ -1,72 +1,151 @@
-// ISO 3166-1 alpha-3 country codes with names + flag emojis.
-// Used by the countries-visited picker and world map highlighting.
+// Single source of truth for countries: the full ISO 3166-1 table as
+// [alpha-2, alpha-3, numeric, name]. Everything else (the picker list, the
+// alpha-3 lookup, the world-map numeric→alpha-3 map, and name fallbacks) is
+// derived from this so the map and the "countries visited" picker can never
+// drift out of sync or be missing entries.
 
 export type Country = { code: string; name: string; flag: string };
 
-export const COUNTRIES: Country[] = [
-  { code: "USA", name: "United States", flag: "🇺🇸" },
-  { code: "CAN", name: "Canada", flag: "🇨🇦" },
-  { code: "MEX", name: "Mexico", flag: "🇲🇽" },
-  { code: "GBR", name: "United Kingdom", flag: "🇬🇧" },
-  { code: "IRL", name: "Ireland", flag: "🇮🇪" },
-  { code: "FRA", name: "France", flag: "🇫🇷" },
-  { code: "ESP", name: "Spain", flag: "🇪🇸" },
-  { code: "PRT", name: "Portugal", flag: "🇵🇹" },
-  { code: "ITA", name: "Italy", flag: "🇮🇹" },
-  { code: "DEU", name: "Germany", flag: "🇩🇪" },
-  { code: "NLD", name: "Netherlands", flag: "🇳🇱" },
-  { code: "BEL", name: "Belgium", flag: "🇧🇪" },
-  { code: "CHE", name: "Switzerland", flag: "🇨🇭" },
-  { code: "AUT", name: "Austria", flag: "🇦🇹" },
-  { code: "DNK", name: "Denmark", flag: "🇩🇰" },
-  { code: "SWE", name: "Sweden", flag: "🇸🇪" },
-  { code: "NOR", name: "Norway", flag: "🇳🇴" },
-  { code: "FIN", name: "Finland", flag: "🇫🇮" },
-  { code: "ISL", name: "Iceland", flag: "🇮🇸" },
-  { code: "POL", name: "Poland", flag: "🇵🇱" },
-  { code: "CZE", name: "Czechia", flag: "🇨🇿" },
-  { code: "HUN", name: "Hungary", flag: "🇭🇺" },
-  { code: "GRC", name: "Greece", flag: "🇬🇷" },
-  { code: "TUR", name: "Turkey", flag: "🇹🇷" },
-  { code: "RUS", name: "Russia", flag: "🇷🇺" },
-  { code: "EGY", name: "Egypt", flag: "🇪🇬" },
-  { code: "MAR", name: "Morocco", flag: "🇲🇦" },
-  { code: "ZAF", name: "South Africa", flag: "🇿🇦" },
-  { code: "KEN", name: "Kenya", flag: "🇰🇪" },
-  { code: "TZA", name: "Tanzania", flag: "🇹🇿" },
-  { code: "NGA", name: "Nigeria", flag: "🇳🇬" },
-  { code: "ARE", name: "United Arab Emirates", flag: "🇦🇪" },
-  { code: "SAU", name: "Saudi Arabia", flag: "🇸🇦" },
-  { code: "ISR", name: "Israel", flag: "🇮🇱" },
-  { code: "JOR", name: "Jordan", flag: "🇯🇴" },
-  { code: "IND", name: "India", flag: "🇮🇳" },
-  { code: "CHN", name: "China", flag: "🇨🇳" },
-  { code: "JPN", name: "Japan", flag: "🇯🇵" },
-  { code: "KOR", name: "South Korea", flag: "🇰🇷" },
-  { code: "TWN", name: "Taiwan", flag: "🇹🇼" },
-  { code: "HKG", name: "Hong Kong", flag: "🇭🇰" },
-  { code: "SGP", name: "Singapore", flag: "🇸🇬" },
-  { code: "THA", name: "Thailand", flag: "🇹🇭" },
-  { code: "VNM", name: "Vietnam", flag: "🇻🇳" },
-  { code: "PHL", name: "Philippines", flag: "🇵🇭" },
-  { code: "IDN", name: "Indonesia", flag: "🇮🇩" },
-  { code: "MYS", name: "Malaysia", flag: "🇲🇾" },
-  { code: "AUS", name: "Australia", flag: "🇦🇺" },
-  { code: "NZL", name: "New Zealand", flag: "🇳🇿" },
-  { code: "BRA", name: "Brazil", flag: "🇧🇷" },
-  { code: "ARG", name: "Argentina", flag: "🇦🇷" },
-  { code: "CHL", name: "Chile", flag: "🇨🇱" },
-  { code: "PER", name: "Peru", flag: "🇵🇪" },
-  { code: "COL", name: "Colombia", flag: "🇨🇴" },
-  { code: "ECU", name: "Ecuador", flag: "🇪🇨" },
-  { code: "CRI", name: "Costa Rica", flag: "🇨🇷" },
-  { code: "PAN", name: "Panama", flag: "🇵🇦" },
-  { code: "GTM", name: "Guatemala", flag: "🇬🇹" },
-  { code: "CUB", name: "Cuba", flag: "🇨🇺" },
-  { code: "JAM", name: "Jamaica", flag: "🇯🇲" },
-  { code: "DOM", name: "Dominican Republic", flag: "🇩🇴" },
+// prettier-ignore
+const ISO: [string, string, string, string][] = [
+  ["AF","AFG","004","Afghanistan"],["AX","ALA","248","Åland Islands"],["AL","ALB","008","Albania"],
+  ["DZ","DZA","012","Algeria"],["AS","ASM","016","American Samoa"],["AD","AND","020","Andorra"],
+  ["AO","AGO","024","Angola"],["AI","AIA","660","Anguilla"],["AQ","ATA","010","Antarctica"],
+  ["AG","ATG","028","Antigua and Barbuda"],["AR","ARG","032","Argentina"],["AM","ARM","051","Armenia"],
+  ["AW","ABW","533","Aruba"],["AU","AUS","036","Australia"],["AT","AUT","040","Austria"],
+  ["AZ","AZE","031","Azerbaijan"],["BS","BHS","044","Bahamas"],["BH","BHR","048","Bahrain"],
+  ["BD","BGD","050","Bangladesh"],["BB","BRB","052","Barbados"],["BY","BLR","112","Belarus"],
+  ["BE","BEL","056","Belgium"],["BZ","BLZ","084","Belize"],["BJ","BEN","204","Benin"],
+  ["BM","BMU","060","Bermuda"],["BT","BTN","064","Bhutan"],["BO","BOL","068","Bolivia"],
+  ["BQ","BES","535","Bonaire, Sint Eustatius and Saba"],["BA","BIH","070","Bosnia and Herzegovina"],
+  ["BW","BWA","072","Botswana"],["BV","BVT","074","Bouvet Island"],["BR","BRA","076","Brazil"],
+  ["IO","IOT","086","British Indian Ocean Territory"],["BN","BRN","096","Brunei"],["BG","BGR","100","Bulgaria"],
+  ["BF","BFA","854","Burkina Faso"],["BI","BDI","108","Burundi"],["CV","CPV","132","Cabo Verde"],
+  ["KH","KHM","116","Cambodia"],["CM","CMR","120","Cameroon"],["CA","CAN","124","Canada"],
+  ["KY","CYM","136","Cayman Islands"],["CF","CAF","140","Central African Republic"],["TD","TCD","148","Chad"],
+  ["CL","CHL","152","Chile"],["CN","CHN","156","China"],["CX","CXR","162","Christmas Island"],
+  ["CC","CCK","166","Cocos (Keeling) Islands"],["CO","COL","170","Colombia"],["KM","COM","174","Comoros"],
+  ["CG","COG","178","Congo"],["CD","COD","180","DR Congo"],["CK","COK","184","Cook Islands"],
+  ["CR","CRI","188","Costa Rica"],["CI","CIV","384","Côte d'Ivoire"],["HR","HRV","191","Croatia"],
+  ["CU","CUB","192","Cuba"],["CW","CUW","531","Curaçao"],["CY","CYP","196","Cyprus"],
+  ["CZ","CZE","203","Czechia"],["DK","DNK","208","Denmark"],["DJ","DJI","262","Djibouti"],
+  ["DM","DMA","212","Dominica"],["DO","DOM","214","Dominican Republic"],["EC","ECU","218","Ecuador"],
+  ["EG","EGY","818","Egypt"],["SV","SLV","222","El Salvador"],["GQ","GNQ","226","Equatorial Guinea"],
+  ["ER","ERI","232","Eritrea"],["EE","EST","233","Estonia"],["SZ","SWZ","748","Eswatini"],
+  ["ET","ETH","231","Ethiopia"],["FK","FLK","238","Falkland Islands"],["FO","FRO","234","Faroe Islands"],
+  ["FJ","FJI","242","Fiji"],["FI","FIN","246","Finland"],["FR","FRA","250","France"],
+  ["GF","GUF","254","French Guiana"],["PF","PYF","258","French Polynesia"],["TF","ATF","260","French Southern Territories"],
+  ["GA","GAB","266","Gabon"],["GM","GMB","270","Gambia"],["GE","GEO","268","Georgia"],
+  ["DE","DEU","276","Germany"],["GH","GHA","288","Ghana"],["GI","GIB","292","Gibraltar"],
+  ["GR","GRC","300","Greece"],["GL","GRL","304","Greenland"],["GD","GRD","308","Grenada"],
+  ["GP","GLP","312","Guadeloupe"],["GU","GUM","316","Guam"],["GT","GTM","320","Guatemala"],
+  ["GG","GGY","831","Guernsey"],["GN","GIN","324","Guinea"],["GW","GNB","624","Guinea-Bissau"],
+  ["GY","GUY","328","Guyana"],["HT","HTI","332","Haiti"],["HM","HMD","334","Heard Island and McDonald Islands"],
+  ["VA","VAT","336","Holy See"],["HN","HND","340","Honduras"],["HK","HKG","344","Hong Kong"],
+  ["HU","HUN","348","Hungary"],["IS","ISL","352","Iceland"],["IN","IND","356","India"],
+  ["ID","IDN","360","Indonesia"],["IR","IRN","364","Iran"],["IQ","IRQ","368","Iraq"],
+  ["IE","IRL","372","Ireland"],["IM","IMN","833","Isle of Man"],["IL","ISR","376","Israel"],
+  ["IT","ITA","380","Italy"],["JM","JAM","388","Jamaica"],["JP","JPN","392","Japan"],
+  ["JE","JEY","832","Jersey"],["JO","JOR","400","Jordan"],["KZ","KAZ","398","Kazakhstan"],
+  ["KE","KEN","404","Kenya"],["KI","KIR","296","Kiribati"],["KP","PRK","408","North Korea"],
+  ["KR","KOR","410","South Korea"],["KW","KWT","414","Kuwait"],["KG","KGZ","417","Kyrgyzstan"],
+  ["LA","LAO","418","Laos"],["LV","LVA","428","Latvia"],["LB","LBN","422","Lebanon"],
+  ["LS","LSO","426","Lesotho"],["LR","LBR","430","Liberia"],["LY","LBY","434","Libya"],
+  ["LI","LIE","438","Liechtenstein"],["LT","LTU","440","Lithuania"],["LU","LUX","442","Luxembourg"],
+  ["MO","MAC","446","Macao"],["MG","MDG","450","Madagascar"],["MW","MWI","454","Malawi"],
+  ["MY","MYS","458","Malaysia"],["MV","MDV","462","Maldives"],["ML","MLI","466","Mali"],
+  ["MT","MLT","470","Malta"],["MH","MHL","584","Marshall Islands"],["MQ","MTQ","474","Martinique"],
+  ["MR","MRT","478","Mauritania"],["MU","MUS","480","Mauritius"],["YT","MYT","175","Mayotte"],
+  ["MX","MEX","484","Mexico"],["FM","FSM","583","Micronesia"],["MD","MDA","498","Moldova"],
+  ["MC","MCO","492","Monaco"],["MN","MNG","496","Mongolia"],["ME","MNE","499","Montenegro"],
+  ["MS","MSR","500","Montserrat"],["MA","MAR","504","Morocco"],["MZ","MOZ","508","Mozambique"],
+  ["MM","MMR","104","Myanmar"],["NA","NAM","516","Namibia"],["NR","NRU","520","Nauru"],
+  ["NP","NPL","524","Nepal"],["NL","NLD","528","Netherlands"],["NC","NCL","540","New Caledonia"],
+  ["NZ","NZL","554","New Zealand"],["NI","NIC","558","Nicaragua"],["NE","NER","562","Niger"],
+  ["NG","NGA","566","Nigeria"],["NU","NIU","570","Niue"],["NF","NFK","574","Norfolk Island"],
+  ["MK","MKD","807","North Macedonia"],["MP","MNP","580","Northern Mariana Islands"],["NO","NOR","578","Norway"],
+  ["OM","OMN","512","Oman"],["PK","PAK","586","Pakistan"],["PW","PLW","585","Palau"],
+  ["PS","PSE","275","Palestine"],["PA","PAN","591","Panama"],["PG","PNG","598","Papua New Guinea"],
+  ["PY","PRY","600","Paraguay"],["PE","PER","604","Peru"],["PH","PHL","608","Philippines"],
+  ["PN","PCN","612","Pitcairn Islands"],["PL","POL","616","Poland"],["PT","PRT","620","Portugal"],
+  ["PR","PRI","630","Puerto Rico"],["QA","QAT","634","Qatar"],["RE","REU","638","Réunion"],
+  ["RO","ROU","642","Romania"],["RU","RUS","643","Russia"],["RW","RWA","646","Rwanda"],
+  ["BL","BLM","652","Saint Barthélemy"],["SH","SHN","654","Saint Helena"],["KN","KNA","659","Saint Kitts and Nevis"],
+  ["LC","LCA","662","Saint Lucia"],["MF","MAF","663","Saint Martin"],["PM","SPM","666","Saint Pierre and Miquelon"],
+  ["VC","VCT","670","Saint Vincent and the Grenadines"],["WS","WSM","882","Samoa"],["SM","SMR","674","San Marino"],
+  ["ST","STP","678","Sao Tome and Principe"],["SA","SAU","682","Saudi Arabia"],["SN","SEN","686","Senegal"],
+  ["RS","SRB","688","Serbia"],["SC","SYC","690","Seychelles"],["SL","SLE","694","Sierra Leone"],
+  ["SG","SGP","702","Singapore"],["SX","SXM","534","Sint Maarten"],["SK","SVK","703","Slovakia"],
+  ["SI","SVN","705","Slovenia"],["SB","SLB","090","Solomon Islands"],["SO","SOM","706","Somalia"],
+  ["ZA","ZAF","710","South Africa"],["GS","SGS","239","South Georgia"],["SS","SSD","728","South Sudan"],
+  ["ES","ESP","724","Spain"],["LK","LKA","144","Sri Lanka"],["SD","SDN","729","Sudan"],
+  ["SR","SUR","740","Suriname"],["SJ","SJM","744","Svalbard and Jan Mayen"],["SE","SWE","752","Sweden"],
+  ["CH","CHE","756","Switzerland"],["SY","SYR","760","Syria"],["TW","TWN","158","Taiwan"],
+  ["TJ","TJK","762","Tajikistan"],["TZ","TZA","834","Tanzania"],["TH","THA","764","Thailand"],
+  ["TL","TLS","626","Timor-Leste"],["TG","TGO","768","Togo"],["TK","TKL","772","Tokelau"],
+  ["TO","TON","776","Tonga"],["TT","TTO","780","Trinidad and Tobago"],["TN","TUN","788","Tunisia"],
+  ["TR","TUR","792","Turkey"],["TM","TKM","795","Turkmenistan"],["TC","TCA","796","Turks and Caicos Islands"],
+  ["TV","TUV","798","Tuvalu"],["UG","UGA","800","Uganda"],["UA","UKR","804","Ukraine"],
+  ["AE","ARE","784","United Arab Emirates"],["GB","GBR","826","United Kingdom"],["US","USA","840","United States"],
+  ["UM","UMI","581","U.S. Minor Outlying Islands"],["UY","URY","858","Uruguay"],["UZ","UZB","860","Uzbekistan"],
+  ["VU","VUT","548","Vanuatu"],["VE","VEN","862","Venezuela"],["VN","VNM","704","Vietnam"],
+  ["VG","VGB","092","British Virgin Islands"],["VI","VIR","850","U.S. Virgin Islands"],["WF","WLF","876","Wallis and Futuna"],
+  ["EH","ESH","732","Western Sahara"],["YE","YEM","887","Yemen"],["ZM","ZMB","894","Zambia"],
+  ["ZW","ZWE","716","Zimbabwe"],["XK","XKX","983","Kosovo"],
 ];
+
+// Turn an ISO alpha-2 code into its flag emoji (regional indicator letters).
+function flagFromAlpha2(a2: string): string {
+  return a2
+    .toUpperCase()
+    .replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0)));
+}
+
+export const COUNTRIES: Country[] = ISO.map(([a2, a3, , name]) => ({
+  code: a3,
+  name,
+  flag: flagFromAlpha2(a2),
+})).sort((a, b) => a.name.localeCompare(b.name));
 
 export const COUNTRY_BY_CODE: Record<string, Country> = Object.fromEntries(
   COUNTRIES.map((c) => [c.code, c])
 );
+
+// ISO 3166-1 numeric (zero-padded to 3) → alpha-3, for the world-atlas map.
+export const ISO_N3_TO_A3: Record<string, string> = Object.fromEntries(
+  ISO.map(([, a3, num]) => [num, a3])
+);
+
+function norm(s: string): string {
+  return s.toLowerCase().replace(/[^a-z]/g, "");
+}
+
+// Normalized country name → alpha-3, a fallback for map features that have no
+// numeric id (e.g. Kosovo) or use an abbreviated Natural Earth label.
+export const NAME_TO_A3: Record<string, string> = {
+  ...Object.fromEntries(ISO.map(([, a3, , name]) => [norm(name), a3])),
+  [norm("United States of America")]: "USA",
+  [norm("Dem. Rep. Congo")]: "COD",
+  [norm("Democratic Republic of the Congo")]: "COD",
+  [norm("Czech Republic")]: "CZE",
+  [norm("Bosnia and Herz.")]: "BIH",
+  [norm("Dominican Rep.")]: "DOM",
+  [norm("Eq. Guinea")]: "GNQ",
+  [norm("Central African Rep.")]: "CAF",
+  [norm("S. Sudan")]: "SSD",
+  [norm("W. Sahara")]: "ESH",
+  [norm("Falkland Is.")]: "FLK",
+  [norm("Fr. S. Antarctic Lands")]: "ATF",
+  [norm("Solomon Is.")]: "SLB",
+  [norm("Ivory Coast")]: "CIV",
+  [norm("Burma")]: "MMR",
+  [norm("Cape Verde")]: "CPV",
+  [norm("Swaziland")]: "SWZ",
+  [norm("Macedonia")]: "MKD",
+  [norm("East Timor")]: "TLS",
+  [norm("Kosovo")]: "XKX",
+};
+
+export function normalizeCountryName(s: string): string {
+  return norm(s);
+}

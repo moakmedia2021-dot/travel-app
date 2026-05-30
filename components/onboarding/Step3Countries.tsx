@@ -22,7 +22,14 @@ export default function Step3Countries({ value, onChange, onBack, onNext }: Prop
         </p>
       </div>
 
-      <WorldMap visited={value} height={260} />
+      <WorldMap
+        visited={value}
+        height={260}
+        onToggle={(code) =>
+          onChange(value.includes(code) ? value.filter((c) => c !== code) : [...value, code])
+        }
+      />
+      <p className="text-center text-xs text-neutral-400">Tap a country on the map, or search below.</p>
 
       <CountriesPicker selected={value} onChange={onChange} />
 
