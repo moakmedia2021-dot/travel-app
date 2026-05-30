@@ -227,7 +227,7 @@ export default function TripChat({
       {/* Slide-over */}
       {open && (
         <div
-          className="fixed inset-0 z-40 flex items-end justify-end sm:items-stretch"
+          className="fixed inset-0 z-50 flex items-end justify-end sm:items-stretch"
           onClick={() => {
             setOpen(false);
             markAllSeen();
