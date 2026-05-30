@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import FinanceTrendChart from "./FinanceCharts";
 import TransactionSlideOver from "./TransactionSlideOver";
 import { AccountsModal, BudgetModal, CategoriesModal } from "./ManageModals";
 import {
@@ -37,6 +37,13 @@ import type {
   ScopeFilter,
   TransactionInput,
 } from "@/lib/finance/types";
+
+// Recharts is heavy (~100kB). Load it only when the finance tab actually
+// renders, keeping the initial admin navigation snappy.
+const FinanceTrendChart = dynamic(() => import("./FinanceCharts"), {
+  ssr: false,
+  loading: () => <div className="h-64 animate-pulse rounded-md bg-neutral-100" />,
+});
 
 type Props = {
   monthKey: string;

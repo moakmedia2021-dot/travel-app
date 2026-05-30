@@ -1,27 +1,13 @@
-import { createClient } from "@/lib/supabase/server";
 import Navbar from "@/components/Navbar";
 import BottomTabBar from "@/components/BottomTabBar";
-import type { Profile } from "@/lib/types";
+import { getCurrentUser, getCurrentProfile } from "@/lib/auth";
 
 export default async function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  let profile: Profile | null = null;
-  if (user) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("id, username, full_name, avatar_url")
-      .eq("id", user.id)
-      .single();
-    profile = data as Profile | null;
-  }
+  const [user, profile] = await Promise.all([getCurrentUser(), getCurrentProfile()]);
 
   return (
     <div className="min-h-screen pb-20 md:pb-0">

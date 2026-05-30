@@ -71,8 +71,12 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // If the user hasn't completed onboarding, send them there
-  if (user && isProtectedRoute && !isOnboardingRoute) {
+  // If the user hasn't completed onboarding, send them there.
+  // Onboarding completion is one-way (false -> true), so once we've confirmed
+  // it we cache it in a per-user cookie and skip this DB round-trip on every
+  // subsequent protected navigation — a major latency win.
+  const onboardedFor = request.cookies.get("gg_onboarded")?.value;
+  if (user && isProtectedRoute && !isOnboardingRoute && onboardedFor !== user.id) {
     const { data: prof } = await supabase
       .from("profiles")
       .select("onboarding_complete")
@@ -83,6 +87,13 @@ export async function updateSession(request: NextRequest) {
       url.pathname = "/onboarding";
       url.search = "";
       return NextResponse.redirect(url);
+    }
+    if (prof) {
+      supabaseResponse.cookies.set("gg_onboarded", user.id, {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 30,
+        sameSite: "lax",
+      });
     }
   }
 

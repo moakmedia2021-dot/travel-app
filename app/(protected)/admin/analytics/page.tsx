@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
+import { getCurrentUser } from "@/lib/auth";
 import { isAdmin } from "@/lib/admin";
 import { isAdminUnlocked, lockAdminPortal } from "@/app/actions/admin";
 import PasswordGate from "@/components/admin/PasswordGate";
 import AdminNav from "@/components/admin/AdminNav";
-import AnalyticsCharts, { type DayCount } from "@/components/admin/AnalyticsCharts";
+import AnalyticsCharts, { type DayCount } from "@/components/admin/AnalyticsChartsLazy";
 
 export const dynamic = "force-dynamic";
 
@@ -37,10 +37,7 @@ function bucketByDay(rows: { created_at: string }[], days = 30): DayCount[] {
 }
 
 export default async function AdminAnalyticsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!isAdmin(user?.id)) notFound();
 
   // Password gate — show form until unlocked for this session

@@ -112,7 +112,7 @@ export default function DocumentsPanel({
       ) : (
         <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white divide-y divide-neutral-100">
           {docs.map((d) => (
-            <div key={d.id} className="flex items-center gap-3 px-4 py-3">
+            <div key={d.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3">
               <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${d.type === "invoice" ? "bg-emerald-100 text-emerald-700" : "bg-violet-100 text-violet-700"}`}>
                 {d.type}
               </span>
@@ -124,7 +124,7 @@ export default function DocumentsPanel({
                 <p className="text-xs text-neutral-500">{new Date(d.created_at).toLocaleDateString()}</p>
               </div>
               {d.total != null && <span className="text-sm font-semibold text-neutral-700">{money(d.total, d.content.currency)}</span>}
-              <div className="flex gap-1">
+              <div className="flex w-full gap-1 sm:w-auto">
                 <button onClick={() => print(d)} className="rounded-md border border-neutral-300 px-2.5 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-50">
                   Print / PDF
                 </button>
@@ -332,11 +332,11 @@ function DocEditor({
 
               <p className="text-xs font-semibold uppercase text-neutral-400">Line items</p>
               {items.map((li, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <input className={`${inputClass} flex-1`} placeholder="Description" value={li.description} onChange={(e) => setItem(i, { description: e.target.value })} />
-                  <input className={`${inputClass} w-16`} type="number" value={li.quantity} onChange={(e) => setItem(i, { quantity: Number(e.target.value) })} />
-                  <input className={`${inputClass} w-24`} type="number" value={li.rate} onChange={(e) => setItem(i, { rate: Number(e.target.value) })} />
-                  <span className="w-20 text-right text-sm tabular-nums text-neutral-600">{money(lineTotal(li), c.currency)}</span>
+                <div key={i} className="flex flex-wrap items-center gap-2">
+                  <input className={`${inputClass} min-w-0 flex-1 basis-full sm:basis-0`} placeholder="Description" value={li.description} onChange={(e) => setItem(i, { description: e.target.value })} />
+                  <input className={`${inputClass} w-14`} type="number" value={li.quantity} onChange={(e) => setItem(i, { quantity: Number(e.target.value) })} aria-label="Quantity" />
+                  <input className={`${inputClass} w-24`} type="number" value={li.rate} onChange={(e) => setItem(i, { rate: Number(e.target.value) })} aria-label="Rate" />
+                  <span className="flex-1 text-right text-sm tabular-nums text-neutral-600 sm:w-20 sm:flex-none">{money(lineTotal(li), c.currency)}</span>
                   <button onClick={() => removeItem(i)} className="text-neutral-300 hover:text-red-500" aria-label="Remove">✕</button>
                 </div>
               ))}

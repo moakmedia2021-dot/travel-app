@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/auth";
 import { isAdmin } from "@/lib/admin";
 import { isAdminUnlocked, lockAdminPortal } from "@/app/actions/admin";
 import PasswordGate from "@/components/admin/PasswordGate";
@@ -35,15 +36,14 @@ export default async function AdminFinancePage({
 }: {
   searchParams: Promise<{ month?: string; scope?: string }>;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!isAdmin(user?.id)) notFound();
 
   if (!(await isAdminUnlocked())) {
     return <PasswordGate />;
   }
+
+  const supabase = await createClient();
 
   const sp = await searchParams;
   const scope = normalizeScope(sp.scope);
