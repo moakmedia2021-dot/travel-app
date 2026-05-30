@@ -20,7 +20,7 @@ export default async function AdminUsersPage() {
     return <PasswordGate />;
   }
 
-  const users = await listUsers();
+  const result = await listUsers();
 
   return (
     <div className="space-y-6">
@@ -48,7 +48,23 @@ export default async function AdminUsersPage() {
         </p>
       </div>
 
-      <UsersManager initial={users} />
+      {result.ok ? (
+        <UsersManager initial={result.users} />
+      ) : (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
+          <h3 className="text-sm font-semibold text-amber-900">Can&apos;t load users</h3>
+          <p className="mt-1 text-sm text-amber-800">{result.error}</p>
+          <p className="mt-3 text-xs text-amber-700">
+            Reading signed-up accounts requires the Supabase{" "}
+            <code className="rounded bg-amber-100 px-1 py-0.5 font-mono">service_role</code> key. Add{" "}
+            <code className="rounded bg-amber-100 px-1 py-0.5 font-mono">
+              SUPABASE_SERVICE_ROLE_KEY
+            </code>{" "}
+            to your environment (Supabase Dashboard → Project Settings → API → service_role), then
+            restart / redeploy.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

@@ -52,11 +52,28 @@ type ProfileRow = {
   deleted_at: string | null;
 };
 
-export async function listUsers(): Promise<AdminUser[]> {
-  const check = await requireAdmin();
-  if (!check.ok) return [];
+export type ListUsersResult =
+  | { ok: true; users: AdminUser[] }
+  | { ok: false; error: string };
 
-  const service = createServiceClient();
+export async function listUsers(): Promise<ListUsersResult> {
+  const check = await requireAdmin();
+  if (!check.ok) return { ok: false, error: check.error };
+
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return {
+      ok: false,
+      error:
+        "SUPABASE_SERVICE_ROLE_KEY is not set. Add it to your environment to load user accounts.",
+    };
+  }
+
+  let service: ReturnType<typeof createServiceClient>;
+  try {
+    service = createServiceClient();
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Service client unavailable" };
+  }
 
   // Pull every auth user (paginated). 200/page, hard stop at 50 pages (10k users).
   const authUsers: {
@@ -72,6 +89,7 @@ export async function listUsers(): Promise<AdminUser[]> {
     const { data, error } = await service.auth.admin.listUsers({ page, perPage });
     if (error) {
       logger.error("adminUsers", "listUsers auth failed", error);
+      if (page === 1) return { ok: false, error: error.message };
       break;
     }
     for (const u of data.users) {
@@ -98,7 +116,7 @@ export async function listUsers(): Promise<AdminUser[]> {
   );
 
   const now = Date.now();
-  return authUsers
+  const users = authUsers
     .map((u): AdminUser => {
       const p = profiles.get(u.id);
       const periodEnd = p?.subscription_period_end ?? null;
@@ -122,6 +140,8 @@ export async function listUsers(): Promise<AdminUser[]> {
       };
     })
     .sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+
+  return { ok: true, users };
 }
 
 export async function verifyUserEmail(userId: string): Promise<R> {
