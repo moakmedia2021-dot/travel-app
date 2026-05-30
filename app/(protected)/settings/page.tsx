@@ -75,6 +75,32 @@ export default async function SettingsPage() {
       </Link>
 
       <NotificationPrefsForm initial={prefs} />
+
+      {/* Legal */}
+      <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
+        <div className="border-b border-neutral-100 px-5 py-3">
+          <h2 className="text-sm font-semibold text-neutral-900">Legal</h2>
+        </div>
+        {[
+          { href: "/privacy", label: "Privacy Policy", desc: "How we collect, use, and protect your data" },
+          { href: "/terms", label: "Terms of Service", desc: "The terms that govern your use of GetGoin" },
+        ].map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="flex items-center justify-between px-5 py-4 hover:bg-neutral-50"
+          >
+            <div>
+              <div className="text-sm font-medium text-neutral-900">{item.label}</div>
+              <div className="text-sm text-neutral-500">{item.desc}</div>
+            </div>
+            <svg className="h-5 w-5 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        ))}
+      </div>
+
       <DangerZone />
     </div>
   );
