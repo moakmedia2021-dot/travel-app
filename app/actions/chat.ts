@@ -34,6 +34,13 @@ export async function sendTripMessage(
   return { ok: true, data: data as string };
 }
 
+export async function deleteTripMessage(messageId: string): Promise<R> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("delete_trip_message", { p_id: messageId });
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
 export async function listTripMessages(
   tripId: string,
   limit = 100

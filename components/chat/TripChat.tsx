@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { sendTripMessage, type TripMessage } from "@/app/actions/chat";
+import { sendTripMessage, deleteTripMessage, type TripMessage } from "@/app/actions/chat";
 import { MemberAvatar, memberDisplayName } from "@/components/budget/MemberAvatar";
 import SheetHandle from "@/components/ui/SheetHandle";
 
@@ -78,7 +78,17 @@ export default function TripChat({
           const row = payload.new as TripMessage;
           setMessages((prev) => {
             if (prev.some((m) => m.id === row.id)) return prev;
-            return [...prev, row];
+            // Reconcile with our own optimistic message (same author + content)
+            // so a message we just sent isn't shown twice.
+            const filtered = prev.filter(
+              (m) =>
+                !(
+                  m.id.startsWith("temp-") &&
+                  m.user_id === row.user_id &&
+                  m.content.trim() === row.content.trim()
+                )
+            );
+            return [...filtered, row];
           });
 
           // Browser notification when chat is closed AND message is from someone else
@@ -96,6 +106,20 @@ export default function TripChat({
               tag: `trip-chat-${tripId}`,
             });
           }
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "trip_messages",
+          filter: `trip_id=eq.${tripId}`,
+        },
+        (payload) => {
+          const old = payload.old as { id?: string };
+          if (!old?.id) return;
+          setMessages((prev) => prev.filter((m) => m.id !== old.id));
         }
       )
       .subscribe();
@@ -144,6 +168,28 @@ export default function TripChat({
     if (!r.ok) {
       setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
       setText(draft);
+      toast.error(r.error);
+      return;
+    }
+    // Reconcile the optimistic message with its real id so the realtime
+    // INSERT (which dedups by id) doesn't add a duplicate.
+    setMessages((prev) => {
+      if (prev.some((m) => m.id === r.data)) {
+        // Realtime already delivered the real row — drop the optimistic one.
+        return prev.filter((m) => m.id !== optimisticId);
+      }
+      return prev.map((m) => (m.id === optimisticId ? { ...m, id: r.data } : m));
+    });
+  }
+
+  async function handleDelete(messageId: string) {
+    if (messageId.startsWith("temp-")) return;
+    if (!confirm("Delete this message?")) return;
+    const prev = messages;
+    setMessages((cur) => cur.filter((m) => m.id !== messageId));
+    const r = await deleteTripMessage(messageId);
+    if (!r.ok) {
+      setMessages(prev); // restore on failure
       toast.error(r.error);
     }
   }
@@ -248,7 +294,7 @@ export default function TripChat({
                         return (
                           <div
                             key={m.id}
-                            className={`flex items-end gap-2 ${
+                            className={`group flex items-end gap-2 ${
                               isMe ? "flex-row-reverse" : "flex-row"
                             }`}
                           >
@@ -277,6 +323,17 @@ export default function TripChat({
                                 {m.content}
                               </p>
                             </div>
+                            {isMe && !m.id.startsWith("temp-") && (
+                              <button
+                                onClick={() => handleDelete(m.id)}
+                                aria-label="Delete message"
+                                className="flex h-7 w-7 shrink-0 items-center justify-center self-center rounded-full text-neutral-400 opacity-60 transition-opacity hover:bg-neutral-100 hover:text-red-600 sm:opacity-0 sm:group-hover:opacity-100"
+                              >
+                                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 7h12M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-7 0v12a1 1 0 001 1h6a1 1 0 001-1V7" />
+                                </svg>
+                              </button>
+                            )}
                           </div>
                         );
                       })}
