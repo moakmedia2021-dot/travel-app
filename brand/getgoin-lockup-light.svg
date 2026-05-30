@@ -1,0 +1,14 @@
+<svg width="900" height="220" viewBox="0 0 900 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- icon -->
+  <g transform="translate(20,30)">
+    <rect width="160" height="160" rx="40" fill="#171717"/>
+    <text x="72" y="82" font-family="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+          font-size="100" font-weight="800" fill="#ffffff" text-anchor="middle" dominant-baseline="central">G</text>
+    <path d="M103 47 L131 59 L103 71 L111 59 Z" fill="#2563eb"/>
+  </g>
+  <!-- wordmark (white for dark backgrounds) -->
+  <text x="220" y="112" font-family="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+        font-size="104" font-weight="800" letter-spacing="-3" dominant-baseline="central">
+    <tspan fill="#ffffff">Get</tspan><tspan fill="#2563eb">Goin</tspan>
+  </text>
+</svg>
