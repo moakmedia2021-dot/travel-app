@@ -159,6 +159,10 @@ export default function ComposeModal({ open, onClose, trips }: Props) {
           </button>
 
           {error && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+
+          <p className="text-xs text-neutral-400">
+            Keep it friendly. Profanity, nudity, and NSFW content are blocked.
+          </p>
         </div>
 
         <div className="flex items-center justify-end gap-2 border-t border-neutral-200 px-5 py-4">

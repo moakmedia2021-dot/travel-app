@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { sendTripMessage, type TripMessage } from "@/app/actions/chat";
 import { MemberAvatar, memberDisplayName } from "@/components/budget/MemberAvatar";
@@ -143,6 +144,7 @@ export default function TripChat({
     if (!r.ok) {
       setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
       setText(draft);
+      toast.error(r.error);
     }
   }
 

@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { moderateText } from "@/lib/moderation";
 
 export type TripMessage = {
   id: string;
@@ -20,6 +21,9 @@ export async function sendTripMessage(
   const text = content.trim();
   if (!text) return { ok: false, error: "Message can't be empty" };
   if (text.length > 4000) return { ok: false, error: "Message too long" };
+
+  const mod = await moderateText(text);
+  if (!mod.allowed) return { ok: false, error: mod.reason };
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("send_trip_message", {

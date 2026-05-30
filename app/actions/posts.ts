@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { moderateText, moderateImageUrl } from "@/lib/moderation";
 import type { FeedItem } from "@/lib/types";
 
 type R<T = void> = (T extends void ? { ok: true } : { ok: true; data: T }) | { ok: false; error: string };
@@ -27,6 +28,14 @@ export async function uploadPostImage(formData: FormData): Promise<R<string>> {
   if (error) return { ok: false, error: error.message };
 
   const { data: pub } = supabase.storage.from("post-images").getPublicUrl(path);
+
+  // NSFW / nudity check — remove the file if it's flagged so it never persists.
+  const imgMod = await moderateImageUrl(pub.publicUrl);
+  if (!imgMod.allowed) {
+    await supabase.storage.from("post-images").remove([path]);
+    return { ok: false, error: imgMod.reason };
+  }
+
   return { ok: true, data: pub.publicUrl };
 }
 
@@ -36,6 +45,13 @@ export async function createPost(input: {
   location_name?: string | null;
   image_url?: string | null;
 }): Promise<R<string>> {
+  const textMod = await moderateText(input.content);
+  if (!textMod.allowed) return { ok: false, error: textMod.reason };
+  if (input.image_url) {
+    const imgMod = await moderateImageUrl(input.image_url);
+    if (!imgMod.allowed) return { ok: false, error: imgMod.reason };
+  }
+
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("create_post", {
     p_content: input.content.trim(),
@@ -65,6 +81,9 @@ export async function createTip(input: {
   lat?: number | null;
   lng?: number | null;
 }): Promise<R<string>> {
+  const textMod = await moderateText(`${input.location_name} ${input.content}`);
+  if (!textMod.allowed) return { ok: false, error: textMod.reason };
+
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("create_tip", {
     p_location_name: input.location_name,
