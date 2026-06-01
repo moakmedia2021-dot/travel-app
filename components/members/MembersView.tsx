@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { TripInvite, TripMember } from "@/lib/types";
-import { createClient } from "@/lib/supabase/client";
+import { useTripPresence } from "@/components/realtime/TripPresenceContext";
 import MemberRow from "./MemberRow";
 import PendingInviteRow from "./PendingInviteRow";
 import InviteModal from "./InviteModal";
@@ -25,30 +25,16 @@ export default function MembersView({
 }: Props) {
   const router = useRouter();
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [presentIds, setPresentIds] = useState<Set<string>>(new Set());
 
-  // Realtime presence: join a channel scoped to this trip and broadcast our user_id.
-  useEffect(() => {
-    const supabase = createClient();
-    const channel = supabase.channel(`trip-presence:${tripId}`, {
-      config: { presence: { key: currentUserId } },
-    });
-
-    channel
-      .on("presence", { event: "sync" }, () => {
-        const state = channel.presenceState();
-        setPresentIds(new Set(Object.keys(state)));
-      })
-      .subscribe(async (status) => {
-        if (status === "SUBSCRIBED") {
-          await channel.track({ online_at: new Date().toISOString() });
-        }
-      });
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [tripId, currentUserId]);
+  // Reuse the single presence channel maintained by TripPresenceProvider in the
+  // trip layout. Opening a second channel with the same topic here collided
+  // with it and broke realtime/presence — so we derive the online members from
+  // the shared context instead.
+  const presence = useTripPresence();
+  const presentIds = useMemo(
+    () => new Set((presence?.presentUsers ?? []).map((u) => u.user_id)),
+    [presence]
+  );
 
   const sortedMembers = useMemo(() => {
     const rank = { owner: 0, editor: 1, viewer: 2 } as const;
