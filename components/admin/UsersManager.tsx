@@ -10,13 +10,15 @@ import {
   type AdminUser,
   type PremiumPlan,
 } from "@/app/actions/adminUsers";
+import { grantAdmin, revokeAdmin } from "@/app/actions/admin";
 
 export default function UsersManager({ initial }: { initial: AdminUser[] }) {
   const router = useRouter();
   const [rows, setRows] = useState(initial);
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<"all" | "premium" | "unverified" | "banned">("all");
+  const [filter, setFilter] = useState<"all" | "premium" | "unverified" | "banned" | "admins">("all");
   const [pending, startTransition] = useTransition();
+  const [grantTarget, setGrantTarget] = useState<AdminUser | null>(null);
 
   useEffect(() => setRows(initial), [initial]);
 
@@ -25,7 +27,7 @@ export default function UsersManager({ initial }: { initial: AdminUser[] }) {
       total: rows.length,
       verified: rows.filter((r) => r.email_verified).length,
       premium: rows.filter((r) => r.is_premium).length,
-      banned: rows.filter((r) => r.banned).length,
+      admins: rows.filter((r) => r.is_admin).length,
     }),
     [rows]
   );
@@ -36,6 +38,7 @@ export default function UsersManager({ initial }: { initial: AdminUser[] }) {
       if (filter === "premium" && !r.is_premium) return false;
       if (filter === "unverified" && r.email_verified) return false;
       if (filter === "banned" && !r.banned) return false;
+      if (filter === "admins" && !r.is_admin) return false;
       if (!q) return true;
       return [r.full_name, r.username, r.email]
         .filter(Boolean)
@@ -82,11 +85,35 @@ export default function UsersManager({ initial }: { initial: AdminUser[] }) {
     });
   }
 
+  // Granting admin requires the portal password — handled via a modal.
+  async function submitGrant(password: string): Promise<string | null> {
+    if (!grantTarget) return "No user";
+    const r = await grantAdmin(grantTarget.id, password);
+    if (!r.ok) return r.error;
+    patch(grantTarget.id, { is_admin: true });
+    toast.success("Admin access granted");
+    setGrantTarget(null);
+    router.refresh();
+    return null;
+  }
+
+  function runRevokeAdmin(u: AdminUser) {
+    if (!confirm(`Revoke admin access for ${u.full_name || u.email || "this user"}?`)) return;
+    startTransition(async () => {
+      const r = await revokeAdmin(u.id);
+      if (!r.ok) return void toast.error(r.error);
+      patch(u.id, { is_admin: false });
+      toast.success("Admin access revoked");
+      router.refresh();
+    });
+  }
+
   const filters: { value: typeof filter; label: string }[] = [
     { value: "all", label: "All" },
     { value: "premium", label: "Premium" },
     { value: "unverified", label: "Unverified" },
     { value: "banned", label: "Banned" },
+    { value: "admins", label: "Admins" },
   ];
 
   return (
@@ -95,7 +122,7 @@ export default function UsersManager({ initial }: { initial: AdminUser[] }) {
         <Stat label="Total users" value={stats.total} />
         <Stat label="Verified" value={stats.verified} />
         <Stat label="Premium" value={stats.premium} />
-        <Stat label="Banned" value={stats.banned} />
+        <Stat label="Admins" value={stats.admins} />
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
@@ -138,10 +165,20 @@ export default function UsersManager({ initial }: { initial: AdminUser[] }) {
                 onVerify={() => runVerify(u)}
                 onPremium={(plan) => runPremium(u, plan)}
                 onBan={(b) => runBan(u, b)}
+                onGrantAdmin={() => setGrantTarget(u)}
+                onRevokeAdmin={() => runRevokeAdmin(u)}
               />
             ))}
           </div>
         </div>
+      )}
+
+      {grantTarget && (
+        <GrantAdminModal
+          user={grantTarget}
+          onClose={() => setGrantTarget(null)}
+          onSubmit={submitGrant}
+        />
       )}
     </div>
   );
@@ -153,12 +190,16 @@ function UserRow({
   onVerify,
   onPremium,
   onBan,
+  onGrantAdmin,
+  onRevokeAdmin,
 }: {
   user: AdminUser;
   pending: boolean;
   onVerify: () => void;
   onPremium: (plan: PremiumPlan) => void;
   onBan: (banned: boolean) => void;
+  onGrantAdmin: () => void;
+  onRevokeAdmin: () => void;
 }) {
   const initial = (u.full_name || u.username || u.email || "?").charAt(0).toUpperCase();
   return (
@@ -178,6 +219,9 @@ function UserRow({
             {u.full_name || u.username || <span className="text-neutral-300">no name</span>}
           </span>
           {u.username && <span className="text-xs text-neutral-400">@{u.username}</span>}
+          {u.is_admin && (
+            <Badge tone="violet">{u.is_env_admin ? "Root admin" : "Admin"}</Badge>
+          )}
           {u.is_premium && <Badge tone="amber">Premium</Badge>}
           {!u.email_verified && <Badge tone="neutral">Unverified</Badge>}
           {u.banned && <Badge tone="red">Banned</Badge>}
@@ -202,6 +246,8 @@ function UserRow({
         onVerify={onVerify}
         onPremium={onPremium}
         onBan={onBan}
+        onGrantAdmin={onGrantAdmin}
+        onRevokeAdmin={onRevokeAdmin}
       />
     </div>
   );
@@ -213,12 +259,16 @@ function ActionsMenu({
   onVerify,
   onPremium,
   onBan,
+  onGrantAdmin,
+  onRevokeAdmin,
 }: {
   user: AdminUser;
   pending: boolean;
   onVerify: () => void;
   onPremium: (plan: PremiumPlan) => void;
   onBan: (banned: boolean) => void;
+  onGrantAdmin: () => void;
+  onRevokeAdmin: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -266,6 +316,17 @@ function ActionsMenu({
             </MenuItem>
           )}
           <div className="my-1 border-t border-neutral-100" />
+          <MenuLabel>Access</MenuLabel>
+          {u.is_env_admin ? (
+            <div className="px-3 py-2 text-sm text-neutral-400">Root admin (env)</div>
+          ) : u.is_admin ? (
+            <MenuItem danger onClick={() => pick(onRevokeAdmin)}>
+              Revoke admin
+            </MenuItem>
+          ) : (
+            <MenuItem onClick={() => pick(onGrantAdmin)}>🔑 Make admin…</MenuItem>
+          )}
+          <div className="my-1 border-t border-neutral-100" />
           {u.banned ? (
             <MenuItem onClick={() => pick(() => onBan(false))}>Unban user</MenuItem>
           ) : (
@@ -308,15 +369,91 @@ function MenuLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Badge({ children, tone }: { children: React.ReactNode; tone: "amber" | "red" | "neutral" }) {
+function Badge({
+  children,
+  tone,
+}: {
+  children: React.ReactNode;
+  tone: "amber" | "red" | "neutral" | "violet";
+}) {
   const cls =
     tone === "amber"
       ? "bg-amber-100 text-amber-700"
       : tone === "red"
       ? "bg-red-100 text-red-700"
+      : tone === "violet"
+      ? "bg-violet-100 text-violet-700"
       : "bg-neutral-100 text-neutral-600";
   return (
     <span className={`rounded-full px-1.5 py-0.5 text-[11px] font-medium ${cls}`}>{children}</span>
+  );
+}
+
+function GrantAdminModal({
+  user,
+  onClose,
+  onSubmit,
+}: {
+  user: AdminUser;
+  onClose: () => void;
+  onSubmit: (password: string) => Promise<string | null>;
+}) {
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function submit() {
+    if (!password) {
+      setError("Enter the admin password");
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    const err = await onSubmit(password);
+    if (err) {
+      setError(err);
+      setBusy(false);
+    }
+  }
+
+  const name = user.full_name || user.username || user.email || "this user";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4" aria-modal>
+      <div className="absolute inset-0 bg-neutral-900/40" onClick={onClose} />
+      <div className="relative w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl">
+        <h2 className="text-base font-semibold text-neutral-900">Grant admin access</h2>
+        <p className="mt-1 text-sm text-neutral-500">
+          This gives <span className="font-medium text-neutral-700">{name}</span> full access to the
+          admin portal. Enter the admin password to confirm.
+        </p>
+        <input
+          type="password"
+          value={password}
+          autoFocus
+          onChange={(e) => setPassword(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && submit()}
+          placeholder="Admin password"
+          className="mt-4 block w-full rounded-md border border-neutral-300 px-3 py-2 text-sm shadow-sm focus:border-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500"
+        />
+        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        <div className="mt-4 flex justify-end gap-2">
+          <button
+            onClick={onClose}
+            className="rounded-md px-3 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={submit}
+            disabled={busy || !password}
+            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-50"
+          >
+            {busy ? "Granting…" : "Grant admin"}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import { isAdmin } from "@/lib/admin";
+import { checkAdmin } from "@/lib/admin";
 import { generateVideoContent, generateContractBody } from "@/lib/business/ai";
 import type {
   Activity,
@@ -28,7 +28,7 @@ async function adminCtx(): Promise<{ supabase: ReturnType<typeof createServiceCl
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!isAdmin(user?.id) || !user) return null;
+  if (!user || !(await checkAdmin(user.id))) return null;
   return { supabase: createServiceClient(), userId: user.id };
 }
 

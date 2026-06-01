@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { isAdmin } from "@/lib/admin";
+import { checkAdmin } from "@/lib/admin";
 import type {
   AccountInput,
   CategoryInput,
@@ -24,7 +24,7 @@ async function adminClient() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!isAdmin(user?.id)) return { supabase: null, user: null };
+  if (!user || !(await checkAdmin(user.id))) return { supabase: null, user: null };
   return { supabase, user };
 }
 

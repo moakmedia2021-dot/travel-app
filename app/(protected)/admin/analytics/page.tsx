@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { createServiceClient } from "@/lib/supabase/service";
 import { getCurrentUser } from "@/lib/auth";
-import { isAdmin } from "@/lib/admin";
+import { checkAdmin } from "@/lib/admin";
 import { isAdminUnlocked, lockAdminPortal } from "@/app/actions/admin";
 import PasswordGate from "@/components/admin/PasswordGate";
 import AdminNav from "@/components/admin/AdminNav";
@@ -38,7 +38,7 @@ function bucketByDay(rows: { created_at: string }[], days = 30): DayCount[] {
 
 export default async function AdminAnalyticsPage() {
   const user = await getCurrentUser();
-  if (!isAdmin(user?.id)) notFound();
+  if (!(await checkAdmin(user?.id))) notFound();
 
   // Password gate — show form until unlocked for this session
   if (!(await isAdminUnlocked())) {

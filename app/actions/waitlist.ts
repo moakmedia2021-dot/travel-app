@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import { isAdmin } from "@/lib/admin";
+import { checkAdmin } from "@/lib/admin";
 import { sendWaitlistWelcomeEmail, sendAccessGrantedEmail } from "@/lib/email/waitlist";
 import { logger } from "@/lib/logger";
 
@@ -51,7 +51,7 @@ async function requireAdmin(): Promise<AdminCheck> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!isAdmin(user?.id)) return { allowed: false, error: "Not authorized" };
+  if (!user || !(await checkAdmin(user.id))) return { allowed: false, error: "Not authorized" };
   return { allowed: true };
 }
 

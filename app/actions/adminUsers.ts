@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import { isAdmin } from "@/lib/admin";
+import { checkAdmin, isEnvAdmin, listGrantedAdminIds } from "@/lib/admin";
 import { logger } from "@/lib/logger";
 
 type R<T = void> =
@@ -29,6 +29,8 @@ export type AdminUser = {
   subscription_period_end: string | null;
   onboarding_complete: boolean;
   deleted: boolean;
+  is_admin: boolean;
+  is_env_admin: boolean; // root admin from env — can't be revoked in the UI
 };
 
 // Admin gate + the current admin's own id (so we can block self-destructive ops).
@@ -37,7 +39,7 @@ async function requireAdmin(): Promise<{ ok: true; adminId: string } | { ok: fal
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!isAdmin(user?.id) || !user) return { ok: false, error: "Not authorized" };
+  if (!user || !(await checkAdmin(user.id))) return { ok: false, error: "Not authorized" };
   return { ok: true, adminId: user.id };
 }
 
@@ -115,6 +117,8 @@ export async function listUsers(): Promise<ListUsersResult> {
     ((profileData ?? []) as ProfileRow[]).map((p) => [p.id, p])
   );
 
+  const grantedAdmins = new Set(await listGrantedAdminIds());
+
   const now = Date.now();
   const users = authUsers
     .map((u): AdminUser => {
@@ -137,6 +141,8 @@ export async function listUsers(): Promise<ListUsersResult> {
         subscription_period_end: periodEnd,
         onboarding_complete: !!p?.onboarding_complete,
         deleted: !!p?.deleted_at,
+        is_admin: isEnvAdmin(u.id) || grantedAdmins.has(u.id),
+        is_env_admin: isEnvAdmin(u.id),
       };
     })
     .sort((a, b) => (a.created_at < b.created_at ? 1 : -1));

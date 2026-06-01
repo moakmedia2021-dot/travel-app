@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
-import { isAdmin } from "@/lib/admin";
+import { checkAdmin } from "@/lib/admin";
 import { isAdminUnlocked, lockAdminPortal } from "@/app/actions/admin";
 import PasswordGate from "@/components/admin/PasswordGate";
 import AdminNav from "@/components/admin/AdminNav";
@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminBusinessPage() {
   const user = await getCurrentUser();
-  if (!isAdmin(user?.id)) notFound();
+  if (!(await checkAdmin(user?.id))) notFound();
   if (!(await isAdminUnlocked())) return <PasswordGate />;
 
   const [collaborations, documents] = await Promise.all([listCollaborations(), listDocuments()]);
