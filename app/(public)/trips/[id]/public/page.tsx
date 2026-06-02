@@ -149,7 +149,7 @@ export default async function PublicTripPage({
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-neutral-500">Read-only itinerary</p>
