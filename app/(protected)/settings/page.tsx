@@ -74,6 +74,22 @@ export default async function SettingsPage() {
         </svg>
       </Link>
 
+      {/* Referrals shortcut */}
+      <Link
+        href="/settings/referrals"
+        className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white p-5 hover:border-neutral-300"
+      >
+        <div>
+          <div className="text-base font-semibold text-neutral-900">Referrals</div>
+          <div className="text-sm text-neutral-500">
+            Invite friends and unlock more free trips
+          </div>
+        </div>
+        <svg className="h-5 w-5 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </Link>
+
       <NotificationPrefsForm initial={prefs} />
 
       {/* Legal */}

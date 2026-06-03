@@ -1,5 +1,6 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
@@ -49,6 +50,15 @@ export async function completeOnboarding(
     p_trip_visibility: payload.trip?.visibility ?? "private",
   });
   if (error) return { ok: false, error: error.message };
+
+  // Attribute the referral (set once) if this user arrived via a referral link.
+  const store = await cookies();
+  const ref = store.get("gg_uref")?.value;
+  if (ref) {
+    await supabase.rpc("attribute_referral", { p_code: ref });
+    store.delete("gg_uref");
+  }
+
   revalidatePath("/", "layout");
   return { ok: true, data: { tripId: (data as string | null) ?? null } };
 }
