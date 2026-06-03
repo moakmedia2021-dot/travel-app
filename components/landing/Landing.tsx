@@ -183,22 +183,22 @@ function Footer() {
         <p className="text-xs text-neutral-500">© {new Date().getFullYear()} GetGoin</p>
         <div className="flex items-center gap-5 text-sm text-neutral-500">
           <a
-            href="https://twitter.com/"
+            href="https://www.tiktok.com/@getgoin.app"
             target="_blank"
             rel="noreferrer"
             className="hover:text-neutral-900"
-            aria-label="Twitter / X"
+            aria-label="TikTok @getgoin.app"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.9 1.5h3.5l-7.6 8.7L24 22.5h-7l-5.5-7.2-6.3 7.2H1.7l8.2-9.4L0 1.5h7.2l5 6.6 6.7-6.6zm-1.2 18.7h1.9L6.4 3.6H4.4l13.3 16.6z" />
+              <path d="M16.6 5.82a4.28 4.28 0 0 1-1.05-2.82h-3.2v12.9a2.55 2.55 0 1 1-2.55-2.55c.2 0 .4.03.59.08v-3.27a5.83 5.83 0 0 0-.59-.03 5.82 5.82 0 1 0 5.82 5.82V9.01a7.45 7.45 0 0 0 4.34 1.39V7.2a4.28 4.28 0 0 1-3.36-1.38z" />
             </svg>
           </a>
           <a
-            href="https://instagram.com/"
+            href="https://instagram.com/getgoin.app"
             target="_blank"
             rel="noreferrer"
             className="hover:text-neutral-900"
-            aria-label="Instagram"
+            aria-label="Instagram @getgoin.app"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="2" y="2" width="20" height="20" rx="5" />
