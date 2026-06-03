@@ -101,6 +101,41 @@ export default async function SettingsPage() {
         ))}
       </div>
 
+      {/* Follow us */}
+      <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
+        <div className="border-b border-neutral-100 px-5 py-3">
+          <h2 className="text-sm font-semibold text-neutral-900">Follow GetGoin</h2>
+        </div>
+        {[
+          {
+            href: "https://www.tiktok.com/@getgoin.app",
+            label: "TikTok",
+            handle: "@getgoin.app",
+          },
+          {
+            href: "https://instagram.com/getgoin.app",
+            label: "Instagram",
+            handle: "@getgoin.app",
+          },
+        ].map((item) => (
+          <a
+            key={item.href}
+            href={item.href}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center justify-between px-5 py-4 hover:bg-neutral-50"
+          >
+            <div>
+              <div className="text-sm font-medium text-neutral-900">{item.label}</div>
+              <div className="text-sm text-neutral-500">{item.handle}</div>
+            </div>
+            <svg className="h-5 w-5 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H9m8 0v8" />
+            </svg>
+          </a>
+        ))}
+      </div>
+
       <DangerZone />
     </div>
   );
