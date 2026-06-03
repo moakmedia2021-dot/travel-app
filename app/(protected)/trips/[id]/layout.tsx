@@ -8,6 +8,7 @@ import PresenceStack from "@/components/realtime/PresenceStack";
 import ItineraryRealtimeSync from "@/components/realtime/ItineraryRealtimeSync";
 import ExpenseRealtimeSync from "@/components/realtime/ExpenseRealtimeSync";
 import TripChat from "@/components/chat/TripChat";
+import DownloadTripButton from "@/components/offline/DownloadTripButton";
 import { listTripMessages } from "@/app/actions/chat";
 import { geocode, getForecast } from "@/lib/weather";
 import type { Trip } from "@/lib/types";
@@ -100,8 +101,9 @@ export default async function TripLayout({
       <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
         <TripHeader trip={t} compact />
         {isMember && (
-          <div className="border-t border-neutral-100 px-5 py-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-100 px-5 py-3">
             <PresenceStack />
+            <DownloadTripButton tripId={id} />
           </div>
         )}
         {forecast.length > 0 && <WeatherStrip forecast={forecast} />}

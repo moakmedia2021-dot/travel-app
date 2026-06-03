@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Toaster from "@/components/ui/Toaster";
 import PosthogProvider from "@/components/PosthogProvider";
+import RegisterServiceWorker from "@/components/pwa/RegisterServiceWorker";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -17,6 +18,11 @@ export const metadata: Metadata = {
     template: "%s · GetGoin",
   },
   description: "Plan trips together, find your people, and book the trip. GetGoin.",
+  appleWebApp: {
+    capable: true,
+    title: "GetGoin",
+    statusBarStyle: "default",
+  },
 };
 
 export const viewport = {
@@ -38,6 +44,7 @@ export default function RootLayout({
           <PosthogProvider>{children}</PosthogProvider>
         </Suspense>
         <Toaster />
+        <RegisterServiceWorker />
       </body>
     </html>
   );
