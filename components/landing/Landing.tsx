@@ -1,5 +1,7 @@
 import Link from "next/link";
 import JoinForm from "./JoinForm";
+import Countdown from "@/components/waitlist/Countdown";
+import DestinationRoulette from "@/components/waitlist/DestinationRoulette";
 
 type Props = {
   waitlistCount: number;
@@ -77,7 +79,7 @@ export default function Landing({ waitlistCount, referralCode }: Props) {
             No more 200-message threads and a trip that never happens.
           </p>
 
-          <div className="mx-auto mt-8 max-w-lg text-left">
+          <div id="join" className="mx-auto mt-8 max-w-lg scroll-mt-20 text-left">
             <JoinForm referralCode={referralCode} />
           </div>
 
@@ -92,6 +94,9 @@ export default function Landing({ waitlistCount, referralCode }: Props) {
           )}
         </div>
       </section>
+
+      {/* Countdown to launch */}
+      <Countdown />
 
       {/* Features */}
       <section className="border-t border-neutral-200 bg-white px-4 py-16 sm:py-20">
@@ -112,6 +117,9 @@ export default function Landing({ waitlistCount, referralCode }: Props) {
           </div>
         </div>
       </section>
+
+      {/* Fun interactive — destination roulette */}
+      <DestinationRoulette />
 
       {/* Social proof */}
       <section className="border-t border-neutral-200 bg-neutral-50 px-4 py-16 text-center">
@@ -165,7 +173,7 @@ function Header() {
   return (
     <header className="border-b border-neutral-200 bg-white">
       <nav className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:h-16 sm:px-6 lg:px-8">
-        <Link href="/" className="text-base font-bold tracking-tight sm:text-lg">
+        <Link href="/waitlist" className="text-base font-bold tracking-tight sm:text-lg">
           Get<span className="text-blue-600">Goin</span>
         </Link>
         <a href="#join" className="text-sm font-medium text-neutral-600 hover:text-neutral-900">

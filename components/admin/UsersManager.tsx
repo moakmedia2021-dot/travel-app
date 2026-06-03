@@ -55,7 +55,7 @@ export default function UsersManager({ initial }: { initial: AdminUser[] }) {
       const r = await verifyUserEmail(u.id);
       if (!r.ok) return void toast.error(r.error);
       patch(u.id, { email_verified: true });
-      toast.success("Account verified");
+      toast.success("Access granted — account confirmed");
       router.refresh();
     });
   }
@@ -303,8 +303,11 @@ function ActionsMenu({
       </button>
       {open && (
         <div className="absolute right-0 top-10 z-20 w-52 overflow-hidden rounded-lg border border-neutral-200 bg-white py-1 shadow-lg">
-          {!u.email_verified && (
-            <MenuItem onClick={() => pick(onVerify)}>✓ Verify account</MenuItem>
+          <MenuLabel>Access</MenuLabel>
+          {u.email_verified ? (
+            <div className="px-3 py-2 text-sm text-green-600">✓ Account active</div>
+          ) : (
+            <MenuItem onClick={() => pick(onVerify)}>✓ Grant access</MenuItem>
           )}
           <MenuLabel>Premium</MenuLabel>
           <MenuItem onClick={() => pick(() => onPremium("month"))}>Grant 1 month</MenuItem>
@@ -316,7 +319,7 @@ function ActionsMenu({
             </MenuItem>
           )}
           <div className="my-1 border-t border-neutral-100" />
-          <MenuLabel>Access</MenuLabel>
+          <MenuLabel>Admin</MenuLabel>
           {u.is_env_admin ? (
             <div className="px-3 py-2 text-sm text-neutral-400">Root admin (env)</div>
           ) : u.is_admin ? (
