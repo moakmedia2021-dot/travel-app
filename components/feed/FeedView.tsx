@@ -1,18 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 import type { FeedItem } from "@/lib/types";
+import { deletePost, deleteTip } from "@/app/actions/posts";
 import PostCard from "./PostCard";
 import ComposeModal from "./ComposeModal";
 
 type Props = {
   initialItems: FeedItem[];
   trips: { id: string; title: string }[];
+  currentUserId: string;
 };
 
-export default function FeedView({ initialItems, trips }: Props) {
+export default function FeedView({ initialItems, trips, currentUserId }: Props) {
   const [composeOpen, setComposeOpen] = useState(false);
+  const [items, setItems] = useState(initialItems);
+
+  useEffect(() => setItems(initialItems), [initialItems]);
+
+  async function handleDelete(item: FeedItem) {
+    if (!confirm(`Delete this ${item.kind}?`)) return;
+    const prev = items;
+    setItems((cur) => cur.filter((i) => !(i.kind === item.kind && i.id === item.id)));
+    const res = item.kind === "tip" ? await deleteTip(item.id) : await deletePost(item.id);
+    if (!res.ok) {
+      setItems(prev);
+      toast.error(res.error);
+    } else {
+      toast.success(item.kind === "tip" ? "Tip deleted" : "Post deleted");
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -34,7 +53,7 @@ export default function FeedView({ initialItems, trips }: Props) {
         </button>
       </div>
 
-      {initialItems.length === 0 ? (
+      {items.length === 0 ? (
         <div className="rounded-xl border border-dashed border-neutral-300 bg-white p-10 text-center">
           <h2 className="text-base font-medium text-neutral-900">Your feed is empty</h2>
           <p className="mt-1 text-sm text-neutral-500">
@@ -57,8 +76,13 @@ export default function FeedView({ initialItems, trips }: Props) {
         </div>
       ) : (
         <div className="space-y-3">
-          {initialItems.map((item) => (
-            <PostCard key={`${item.kind}-${item.id}`} item={item} />
+          {items.map((item) => (
+            <PostCard
+              key={`${item.kind}-${item.id}`}
+              item={item}
+              canDelete={item.user_id === currentUserId}
+              onDelete={() => handleDelete(item)}
+            />
           ))}
         </div>
       )}

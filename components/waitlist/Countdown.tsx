@@ -4,6 +4,14 @@ import { useEffect, useState } from "react";
 
 // App goes live August 1, 2026 (local time).
 const TARGET = new Date(2026, 7, 1, 0, 0, 0).getTime();
+// Build progress is measured from this anchor; the bar hits 100% at launch.
+const PROGRESS_START = new Date(2026, 0, 1, 0, 0, 0).getTime();
+
+function pctReady(): number {
+  const total = TARGET - PROGRESS_START;
+  const done = Math.min(Math.max(Date.now() - PROGRESS_START, 0), total);
+  return total > 0 ? (done / total) * 100 : 100;
+}
 
 type Parts = { d: number; h: number; m: number; s: number; done: boolean };
 
@@ -35,6 +43,9 @@ export default function Countdown() {
     { label: "Seconds", value: t?.s ?? null },
   ];
 
+  // Only compute once mounted (avoids server/client hydration mismatch).
+  const pct = t ? pctReady() : 0;
+
   return (
     <section className="border-t border-neutral-200 bg-neutral-50 px-4 py-16 sm:py-20">
       <div className="mx-auto max-w-3xl text-center">
@@ -61,7 +72,26 @@ export default function Countdown() {
           ))}
         </div>
 
-        <p className="mt-5 text-sm text-neutral-500">
+        {/* Build progress to launch */}
+        <div className="mx-auto mt-10 max-w-xl">
+          <div className="mb-2 flex items-baseline justify-between">
+            <span className="text-sm font-medium text-neutral-700">Building GetGoin</span>
+            <span className="font-mono text-sm font-semibold tabular-nums text-blue-600">
+              {t ? `${Math.floor(pct)}%` : "––%"}
+            </span>
+          </div>
+          <div className="h-3 overflow-hidden rounded-full bg-neutral-200">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-blue-600 to-green-500 transition-[width] duration-700 ease-out"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <p className="mt-2 text-xs text-neutral-400">
+            {t && pct >= 100 ? "Ready to launch 🚀" : "Updates every day until launch day."}
+          </p>
+        </div>
+
+        <p className="mt-6 text-sm text-neutral-500">
           Join the waitlist now and you&apos;ll be first through the door.
         </p>
       </div>

@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import NewTripButton from "@/components/NewTripButton";
 import TripCard from "@/components/TripCard";
+import WouldYouRather from "@/components/dashboard/WouldYouRather";
 import type { Trip } from "@/lib/types";
 import Link from "next/link";
 
@@ -47,6 +48,8 @@ export default async function DashboardPage() {
         </div>
         <NewTripButton />
       </div>
+
+      <WouldYouRather />
 
       <section>
         <div className="mb-3 flex items-baseline justify-between">

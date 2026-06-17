@@ -22,5 +22,5 @@ export default async function FeedPage() {
   const items = (feedRes.data ?? []) as FeedItem[];
   const trips = (tripsRes.data ?? []) as { id: string; title: string }[];
 
-  return <FeedView initialItems={items} trips={trips} />;
+  return <FeedView initialItems={items} trips={trips} currentUserId={user?.id ?? ""} />;
 }
