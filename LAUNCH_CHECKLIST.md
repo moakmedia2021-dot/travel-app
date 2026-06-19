@@ -45,7 +45,8 @@ Check boxes as we complete them.
 
 ## 🟡 Pre-launch checks
 
-- [ ] **9. Forgot-password / password-reset flow exists and works** **[Me to verify]**
+- [x] **9. Forgot-password / password-reset flow** **[Me]** ✅ *built*
+  Added "Forgot password?" on login → `/forgot-password` (sends reset email) → `/reset-password` (sets new password via the recovery session). **[You]** note: the reset email is sent by **Supabase Auth** (not Resend) — for production deliverability, configure custom SMTP under Supabase → Authentication → Email, or it uses Supabase's rate-limited default sender.
 
 - [ ] **10. Launch-day toggle** **[You]**
   Test flipping `WAITLIST_MODE` off cleanly opens signup. (Countdown + progress bar already auto-hit 100% on Aug 1.)
