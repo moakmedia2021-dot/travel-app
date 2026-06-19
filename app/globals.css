@@ -5,9 +5,22 @@
 @layer base {
   html {
     @apply antialiased;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
     @apply bg-neutral-50 text-neutral-900;
+    /* Belt-and-suspenders against accidental horizontal scroll on mobile. */
+    overflow-x: hidden;
+  }
+
+  /* iOS Safari zooms the viewport when you focus an input whose font-size is
+     under 16px. Force 16px on mobile so focusing a field never zooms. */
+  @media (max-width: 640px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
   }
 }
