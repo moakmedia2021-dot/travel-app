@@ -9,7 +9,7 @@ type Result<T = void> =
   | { ok: false; error: string };
 
 function siteUrl(): string {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  return (process.env.NEXT_PUBLIC_SITE_URL || "https://getgoin.app").replace(/\/$/, "");
 }
 
 export type InvitableConnection = {

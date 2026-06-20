@@ -121,7 +121,7 @@ export async function grantAccess(waitlistId: string): Promise<R> {
   if (row.granted_access) return { ok: false, error: "Already granted" };
 
   // Generate a magic link via Supabase admin
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://getgoin.app").replace(/\/$/, "");
   const { data: linkData, error: linkError } = await service.auth.admin.generateLink({
     type: "magiclink",
     email: row.email as string,

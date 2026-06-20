@@ -9,7 +9,7 @@ function fromAddress(): string {
 }
 
 function siteUrl(): string {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  return (process.env.NEXT_PUBLIC_SITE_URL || "https://getgoin.app").replace(/\/$/, "");
 }
 
 async function sendEmail(args: { to: string; subject: string; html: string }): Promise<SendResult> {
