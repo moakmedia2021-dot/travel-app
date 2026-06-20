@@ -32,8 +32,8 @@ Check boxes as we complete them.
 
 ## 🟠 Strongly recommended
 
-- [ ] **6. Wire rate limiting onto real endpoints** **[Me + You]**
-  `lib/ratelimit.ts` exists but only guards `/api/health`. Apply it to waitlist join, posts, AI itinerary generation, and deals search (OpenAI/Duffel calls cost money). *[Me]* wires it; *[You]* set `UPSTASH_REDIS_REST_URL` + `_TOKEN`.
+- [x] **6. Wire rate limiting onto real endpoints** **[Me]** ✅ *built* — **[You]** still set Upstash env
+  Applied per-feature limits: waitlist join (5/min·IP), posts/tips (20/min), AI itinerary (6 per 5min·user), flight/hotel search (40/min). Stays a **no-op until you set `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`** (free tier at console.upstash.com) — then limits enforce automatically.
 
 - [ ] **7. Rotate service-role key + set admin password** **[You]**
   Rotate `SUPABASE_SERVICE_ROLE_KEY` (pasted in chat earlier). Set `ADMIN_PORTAL_PASSWORD` in prod (the `moakmedia21` default is in code).

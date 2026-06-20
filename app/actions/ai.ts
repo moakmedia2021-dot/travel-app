@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { generateItinerary, hasOpenAIKey, type GeneratedItem } from "@/lib/openai";
+import { rateLimitOk, aiLimit } from "@/lib/ratelimit";
 
 type Result<T = void> =
   | (T extends void ? { ok: true } : { ok: true; data: T })
@@ -20,6 +21,14 @@ export async function generateTripItinerary(
   if (!hasOpenAIKey()) return { ok: false, error: "OpenAI not configured" };
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not authenticated" };
+  if (!(await rateLimitOk(aiLimit, user.id))) {
+    return { ok: false, error: "You've hit the AI generation limit. Try again in a few minutes." };
+  }
+
   const { data: trip, error } = await supabase
     .from("trips")
     .select("destination, start_date, end_date, currency, budget_total, travelers")

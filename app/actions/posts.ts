@@ -3,7 +3,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { moderateText, moderateImageUrl } from "@/lib/moderation";
+import { rateLimitOk, postLimit } from "@/lib/ratelimit";
 import type { FeedItem } from "@/lib/types";
+
+const RATE_LIMIT_MSG = "You're doing that too fast. Take a breather and try again in a minute.";
 
 type R<T = void> = (T extends void ? { ok: true } : { ok: true; data: T }) | { ok: false; error: string };
 
@@ -45,6 +48,8 @@ export async function createPost(input: {
   location_name?: string | null;
   image_url?: string | null;
 }): Promise<R<string>> {
+  if (!(await rateLimitOk(postLimit))) return { ok: false, error: RATE_LIMIT_MSG };
+
   const textMod = await moderateText(input.content);
   if (!textMod.allowed) return { ok: false, error: textMod.reason };
   if (input.image_url) {
@@ -81,6 +86,8 @@ export async function createTip(input: {
   lat?: number | null;
   lng?: number | null;
 }): Promise<R<string>> {
+  if (!(await rateLimitOk(postLimit))) return { ok: false, error: RATE_LIMIT_MSG };
+
   const textMod = await moderateText(`${input.location_name} ${input.content}`);
   if (!textMod.allowed) return { ok: false, error: textMod.reason };
 

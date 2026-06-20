@@ -47,6 +47,39 @@ export const strictLimit = makeLimit(10, 60, "strict");
 // 60 requests per minute (default API)
 export const standardLimit = makeLimit(60, 60, "standard");
 
+// --- Per-feature limits used by server actions ------------------------------
+// Waitlist signups — per IP, anti-spam.
+export const waitlistLimit = makeLimit(5, 60, "waitlist");
+// Feed posts / tips — per user, anti-spam.
+export const postLimit = makeLimit(20, 60, "post");
+// AI itinerary generation — per user. Costly (OpenAI), so keep it tight.
+export const aiLimit = makeLimit(6, 300, "ai");
+// Flight/hotel/activity search — per user. Costly (Duffel).
+export const dealsLimit = makeLimit(40, 60, "deals");
+
+/**
+ * Server-action rate limit. Keys by the given identifier (use the user id for
+ * per-user limits); falls back to the request IP from headers when no id is
+ * given (e.g. unauthenticated waitlist signups). Returns true if allowed.
+ */
+export async function rateLimitOk(
+  limit: Limit,
+  identifier?: string | null
+): Promise<boolean> {
+  let id = identifier ?? null;
+  if (!id) {
+    const { headers } = await import("next/headers");
+    const h = await headers();
+    id =
+      h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      h.get("x-real-ip") ||
+      h.get("cf-connecting-ip") ||
+      "anonymous";
+  }
+  const { success } = await limit.check(id);
+  return success;
+}
+
 /**
  * Get the requester's IP from common headers (Vercel sets these).
  * Falls back to "anonymous" if nothing is present.

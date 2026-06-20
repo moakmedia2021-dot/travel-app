@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { checkAdmin } from "@/lib/admin";
+import { rateLimitOk, waitlistLimit } from "@/lib/ratelimit";
 import { sendWaitlistWelcomeEmail, sendAccessGrantedEmail } from "@/lib/email/waitlist";
 import { logger } from "@/lib/logger";
 
@@ -16,6 +17,10 @@ export async function joinWaitlist(formData: FormData): Promise<R<{ referralCode
   const ref = String(formData.get("ref") ?? "").trim() || null;
 
   if (!email) return { ok: false, error: "Email is required" };
+
+  if (!(await rateLimitOk(waitlistLimit))) {
+    return { ok: false, error: "Too many attempts. Please wait a minute and try again." };
+  }
 
   // Public RPC — anon key is fine
   const supabase = await createClient();

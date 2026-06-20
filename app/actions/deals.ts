@@ -14,8 +14,11 @@ import {
 } from "@/lib/duffel";
 import { searchActivities as searchMockActivities, type Activity } from "@/lib/mockActivities";
 import { searchMockHotels } from "@/lib/mockHotels";
+import { rateLimitOk, dealsLimit } from "@/lib/ratelimit";
 
 type Result<T> = { ok: true; data: T } | { ok: false; error: string };
+
+const SEARCH_RATE_MSG = "Too many searches. Wait a minute and try again.";
 
 function mapError(e: unknown): string {
   if (e instanceof DuffelError) {
@@ -49,6 +52,7 @@ export async function searchFlightsAction(args: {
   currencyCode?: string;
 }): Promise<Result<FlightOffer[]>> {
   if (!hasDuffelKey()) return { ok: false, error: "Duffel not configured" };
+  if (!(await rateLimitOk(dealsLimit))) return { ok: false, error: SEARCH_RATE_MSG };
   try {
     const offers = await duffelSearchFlights(args);
     return { ok: true, data: offers };
@@ -66,6 +70,7 @@ export async function searchHotelsAction(args: {
   cityLabel?: string;
   currency?: string;
 }): Promise<Result<HotelOffer[]>> {
+  if (!(await rateLimitOk(dealsLimit))) return { ok: false, error: SEARCH_RATE_MSG };
   // Try real Duffel Stays. If the account doesn't have Stays enabled (403),
   // fall back to mock so the UI still works.
   if (hasDuffelKey()) {
