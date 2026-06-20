@@ -5,6 +5,7 @@ import "./globals.css";
 import Toaster from "@/components/ui/Toaster";
 import PosthogProvider from "@/components/PosthogProvider";
 import RegisterServiceWorker from "@/components/pwa/RegisterServiceWorker";
+import CookieConsent from "@/components/CookieConsent";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -45,6 +46,7 @@ export default function RootLayout({
         </Suspense>
         <Toaster />
         <RegisterServiceWorker />
+        <CookieConsent />
       </body>
     </html>
   );

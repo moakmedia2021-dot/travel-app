@@ -55,7 +55,8 @@ Check boxes as we complete them.
 
 - [ ] **12. Sentry + PostHog keys set in prod** **[You]** (error + usage visibility on day one)
 
-- [ ] **13. Cookie/consent banner** **[Me]** (needed for EU traffic; none currently)
+- [x] **13. Cookie/consent banner** **[Me]** ✅ *built*
+  First-visit banner with "Accept all" / "Essential only" + Privacy link. Analytics (PostHog) is now **gated on consent** — it doesn't load or set cookies until the visitor accepts. Choice persists; declining keeps it off.
 
 - [ ] **14. Real support/contact channel** **[You]** users can reach
 

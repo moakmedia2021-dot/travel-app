@@ -1,21 +1,23 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import posthog from "posthog-js";
 import { createClient } from "@/lib/supabase/client";
 import { identifySentryUser } from "@/lib/errorContext";
+import { analyticsAllowed, CONSENT_EVENT } from "@/lib/consent";
 
 export default function PosthogProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Init once on mount
-  useEffect(() => {
+  // Initialise PostHog — only ever runs once the user has granted consent.
+  const initPosthog = useCallback(() => {
     const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
     const host = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
     if (!key) return;
     if (typeof window === "undefined") return;
+    if (!analyticsAllowed()) return; // no consent → no analytics, no cookies
     if ((window as unknown as { __posthog_initialized?: boolean }).__posthog_initialized) return;
 
     posthog.init(key, {
@@ -26,6 +28,13 @@ export default function PosthogProvider({ children }: { children: React.ReactNod
     });
     (window as unknown as { posthog?: typeof posthog }).posthog = posthog;
     (window as unknown as { __posthog_initialized?: boolean }).__posthog_initialized = true;
+
+    // Capture the current page now that we're live (the route effect below
+    // only fires on subsequent navigations).
+    const qs = new URLSearchParams(window.location.search).toString();
+    posthog.capture("$pageview", {
+      $current_url: qs ? `${window.location.pathname}?${qs}` : window.location.pathname,
+    });
 
     // Identify the signed-in user (best effort)
     const supabase = createClient();
@@ -55,6 +64,14 @@ export default function PosthogProvider({ children }: { children: React.ReactNod
       });
     });
   }, []);
+
+  // Init on mount if consent already granted, and react when it's granted later.
+  useEffect(() => {
+    initPosthog();
+    const onConsent = () => initPosthog();
+    window.addEventListener(CONSENT_EVENT, onConsent);
+    return () => window.removeEventListener(CONSENT_EVENT, onConsent);
+  }, [initPosthog]);
 
   // Track page views on route changes
   useEffect(() => {
