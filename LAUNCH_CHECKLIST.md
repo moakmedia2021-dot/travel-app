@@ -38,7 +38,7 @@ Check boxes as we complete them.
 - [ ] **7. Rotate service-role key + set admin password** **[You]**
   Rotate `SUPABASE_SERVICE_ROLE_KEY` (pasted in chat earlier). Set `ADMIN_PORTAL_PASSWORD` in prod (the `moakmedia21` default is in code).
 
-- [~] **8. Custom domain + email deliverability** — *DNS ✅, code ✅, auth pending*
+- [~] **8. Custom domain + email deliverability** — *domain connected ✅ (getgoin.app + www verified in Vercel), code ✅, auth + redeploy pending*
   `getgoin.app` (A → 76.76.21.21) + `www` (CNAME → cname.vercel-dns.com) verified at Vercel. **[Me] done:** all URL fallbacks now use `https://getgoin.app`, so production links are correct **even without** the Vercel env var set. **[You] remaining — REQUIRED for login/reset to work on the new domain:** Supabase → Authentication → URL Configuration → Site URL `https://getgoin.app` + Redirect URLs `https://getgoin.app/**` and `https://www.getgoin.app/**`. Optional: also set `NEXT_PUBLIC_SITE_URL` in Vercel for clarity. Resend SPF/DKIM ties to #2.
 
 ---
