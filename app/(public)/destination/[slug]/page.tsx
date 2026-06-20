@@ -15,7 +15,7 @@ export const dynamicParams = true;
 type Params = { slug: string };
 
 function siteUrl() {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "https://travel-app-xfgp.vercel.app").replace(/\/$/, "");
+  return (process.env.NEXT_PUBLIC_SITE_URL || "https://getgoin.app").replace(/\/$/, "");
 }
 
 function titleCase(s: string): string {

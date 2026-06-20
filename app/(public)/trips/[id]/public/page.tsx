@@ -12,7 +12,7 @@ export const revalidate = 300;
 type Params = { id: string };
 
 function siteUrl() {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "https://travel-app-xfgp.vercel.app").replace(/\/$/, "");
+  return (process.env.NEXT_PUBLIC_SITE_URL || "https://getgoin.app").replace(/\/$/, "");
 }
 
 async function loadTrip(id: string) {

@@ -10,7 +10,7 @@ export const revalidate = 300;
 type Params = { username: string };
 
 function siteUrl() {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "https://travel-app-xfgp.vercel.app").replace(/\/$/, "");
+  return (process.env.NEXT_PUBLIC_SITE_URL || "https://getgoin.app").replace(/\/$/, "");
 }
 
 function truncate(s: string, n: number): string {

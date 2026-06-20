@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://travel-app-xfgp.vercel.app").replace(/\/$/, "");
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://getgoin.app").replace(/\/$/, "");
 
 export default function robots(): MetadataRoute.Robots {
   return {
